@@ -3,26 +3,26 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <meta name="theme-color" content="#f8f1eb">
+  <meta name="theme-color" content="#f1f0e9">
   <title>Nuestro Hogar 🏡</title>
 
   <!-- Supabase: necesario para sincronizar entre móviles -->
 
   <style>
     :root {
-      --bg:#f8f1eb; --card:#fffaf6; --card2:#f5e8e0;
-      --text:#403532; --muted:#8f7d76; --terra:#c97f69;
-      --terra-dark:#a96350; --rose:#dfb5aa; --sage:#aab9a0;
-      --line:#eadbd2; --white:#fffdfb;
-      --shadow:0 12px 35px rgba(107,75,62,.09); --radius:22px;
+      --bg:#f1f0e9; --card:#faf9f5; --card2:#e5e7de;
+      --text:#30352f; --muted:#73796f; --terra:#71805f;
+      --terra-dark:#536044; --rose:#b9c2ad; --sage:#9eae91;
+      --line:#d9ddd3; --white:#fdfcf9;
+      --shadow:0 12px 35px rgba(55,64,52,.09); --radius:22px;
     }
     *{box-sizing:border-box}
     body{
       margin:0; min-height:100vh; color:var(--text);
       font-family:-apple-system,BlinkMacSystemFont,"SF Pro Display","Segoe UI",sans-serif;
       background:
-        radial-gradient(circle at 90% 0%,rgba(223,181,170,.22),transparent 30%),
-        radial-gradient(circle at 0% 35%,rgba(170,185,160,.14),transparent 28%),var(--bg);
+        radial-gradient(circle at 90% 0%,rgba(113,128,95,.16),transparent 30%),
+        radial-gradient(circle at 0% 35%,rgba(82,96,68,.10),transparent 28%),var(--bg);
     }
     button,input,select{font:inherit}
     button{cursor:pointer}
@@ -50,7 +50,7 @@
     .add-row{display:grid;grid-template-columns:1fr auto;gap:9px}
     input,select{border:1px solid var(--line);background:var(--white);color:var(--text);outline:none;border-radius:15px;padding:13px 14px;width:100%}
     input:focus,select:focus{border-color:var(--rose);box-shadow:0 0 0 4px rgba(223,181,170,.16)}
-    .add-btn{border:0;background:var(--terra);color:white;min-width:50px;border-radius:15px;font-size:22px;box-shadow:0 8px 18px rgba(169,99,80,.2)}
+    .add-btn{border:0;background:var(--terra);color:white;min-width:50px;border-radius:15px;font-size:22px;box-shadow:0 8px 18px rgba(83,96,68,.20)}
     .details-row{display:grid;grid-template-columns:1fr 105px;gap:9px;margin-top:9px}
     .quantity-box{display:flex;align-items:center;gap:10px;background:var(--white);border:1px solid var(--line);border-radius:15px;padding:8px 12px}
     .quantity-box label{font-size:10px;color:var(--muted);white-space:nowrap}
@@ -126,6 +126,17 @@
     .undo-btn,.clear-history{border:0;background:transparent;color:var(--terra-dark);font-size:11px;font-weight:800;white-space:nowrap}
     .history-actions{display:flex;justify-content:flex-end;margin-top:10px}
 
+    .bucket{margin-bottom:12px;overflow:hidden}
+    .bucket-head{display:flex;align-items:center;justify-content:space-between;gap:10px;padding:13px 14px;background:linear-gradient(90deg,rgba(245,232,224,.72),rgba(255,250,246,.5));border-bottom:1px solid var(--line)}
+    .bucket-title{display:flex;align-items:center;gap:8px;font-weight:850;font-size:14px}.bucket-count{color:var(--muted);font-size:10px;font-weight:700}
+    .bucket-empty{padding:13px 14px;color:var(--muted);font-size:11px}
+    .idea-actions{display:flex;align-items:center;gap:7px;margin-top:8px}
+    .shop-select{min-height:31px;padding:7px 11px}.shop-select.selected{background:#dfe8db;color:#65755d}
+    .shop-picker{padding:14px;margin-bottom:12px}.shop-picker h3{font:500 22px Georgia,serif;margin:0}.shop-picker p{margin:5px 0 12px;color:var(--muted);font-size:11px;line-height:1.35}
+    .picker-group{margin-top:10px}.picker-title{font-size:10px;font-weight:850;letter-spacing:.07em;color:var(--muted);margin-bottom:5px}
+    .picker-item{display:flex;align-items:center;justify-content:space-between;gap:10px;padding:9px 0;border-top:1px solid rgba(234,219,210,.65)}.picker-name{min-width:0;font-size:12px;font-weight:700}.picker-meta{color:var(--muted);font-size:10px;margin-top:2px}
+    .picker-btn{border:0;border-radius:999px;background:var(--terra);color:#fff;padding:7px 10px;font-size:10px;font-weight:850;white-space:nowrap}.picker-btn.selected{background:#dfe8db;color:#65755d}
+    .history-delete{border:0;background:transparent;color:#a96350;font-size:10px;font-weight:850;padding:8px 0}
     .hidden{display:none!important}
     @media(min-width:600px){.app{padding-top:45px}}
   </style>
@@ -176,15 +187,16 @@
       </div>
       <div class="details-row">
         <select id="categoryInput">
-          <option value="🛒 General">🛒 General</option>
-          <option value="🥑 Alimentación">🥑 Alimentación</option>
-          <option value="🧽 Limpieza">🧽 Limpieza</option>
-          <option value="🛁 Baño">🛁 Baño</option>
           <option value="🍳 Cocina">🍳 Cocina</option>
+          <option value="🛁 Baño">🛁 Baño</option>
+          <option value="🛋️ Salón">🛋️ Salón</option>
           <option value="🛏️ Dormitorio">🛏️ Dormitorio</option>
-          <option value="🕯️ Decoración">🕯️ Decoración</option>
-          <option value="🪑 Muebles">🪑 Muebles</option>
+          <option value="🧽 Limpieza">🧽 Limpieza</option>
+          <option value="🥑 Alimentación">🥑 Alimentación</option>
           <option value="🐾 Mascotas">🐾 Mascotas</option>
+          <option value="🪑 Muebles">🪑 Muebles</option>
+          <option value="🕯️ Decoración">🕯️ Decoración</option>
+          <option value="🛒 General">🛒 General</option>
         </select>
         <input id="plannedPriceInput" type="number" min="0" step="0.01" placeholder="€/unidad">
       </div>
@@ -202,7 +214,7 @@
       <p class="hint">💡 El precio es por unidad. Si ponéis 2 € y cantidad 2, el estimado será 4 €.</p>
     </section>
 
-    <p class="hint" style="margin:0 3px 10px">💡 Esta pestaña es vuestra lista de ideas. Solo lo que marquéis como <strong>Añadir a compra</strong> aparecerá en 🛒 Comprando.</p>
+    <p class="hint" style="margin:0 3px 10px">💡 Aquí guardáis <strong>todo lo que está pendiente en casa</strong>, organizado por zonas. Solo lo que añadáis a una compra aparecerá en 🛒 Comprando.</p>
     <nav class="toolbar">
       <button class="filter active" data-filter="all">Todo</button>
       <button class="filter" data-filter="pending">Pendiente</button>
@@ -219,6 +231,11 @@
   </section>
 
   <section id="shopView" class="hidden">
+    <section class="card shop-picker">
+      <h3>¿Qué quieres comprar ahora?</h3>
+      <p>Elige aquí solo las cosas que vas a comprar en esta visita. Lo demás se queda guardado en 💡 Ideas.</p>
+      <div id="shopPicker"></div>
+    </section>
     <div class="card checkout">
       <div class="checkout-title">
         <div>
@@ -289,11 +306,16 @@ function renderTabs(){["listView","shopView","historyView"].forEach(id=>$(id).cl
 function renderStats(){const pending=items.filter(x=>!x.done).length;const planned=items.reduce((s,x)=>s+(Number(x.planned_price)||0)*(Number(x.quantity)||1),0);$("totalCount").textContent=items.length;$("pendingCount").textContent=pending;$("listPrice").textContent=planned?money(planned):"—";$("statusText").textContent=items.length?pending+" "+(pending===1?"producto pendiente":"productos pendientes"):"La lista está vacía"}
 function renderBudget(){const b=Number(localStorage.getItem("our-home-budget")||0);$("budgetInput").value=b||"";const p=items.reduce((s,x)=>s+(Number(x.planned_price)||0)*(Number(x.quantity)||1),0);$("budgetBar").style.width=(b?Math.min(100,p/b*100):0)+"%";$("budgetText").textContent=b?money(p)+" estimados de "+money(b)+" · "+(p<=b?money(b-p)+" disponibles":money(p-b)+" por encima"):"Sin presupuesto definido"}
 function filtered(){return currentFilter==="pending"?items.filter(x=>!x.done):currentFilter==="done"?items.filter(x=>x.done):items}
-function listRow(x){const q=Number(x.quantity)||1;const planned=x.planned_price!=null&&x.planned_price!==""?Number(x.planned_price):null;const actual=x.actual_price!=null&&x.actual_price!==""?Number(x.actual_price):null;let action="";if(!x.done){action=x.in_shopping?'<button class="shop-select selected" data-action="removeShop" data-id="'+esc(x.id)+'" type="button">✓ En compra</button>':'<button class="shop-select" data-action="addShop" data-id="'+esc(x.id)+'" type="button">＋ Añadir a compra</button>'}return '<div class="item '+(x.done?"done":"")+'"><button class="check" data-action="toggle" data-id="'+esc(x.id)+'" type="button">'+(x.done?"✓":"")+'</button><div><div class="product-line"><span class="product-name">'+esc(x.name)+'</span><span class="tag">'+esc(x.category||"🛒 General")+'</span><span class="tag">×'+q+'</span></div><div class="meta"><span class="tag">'+(x.person==="Pol"?"👨 Pol":"👩 Alyssa")+'</span>'+(planned!=null?'<span class="price">'+q+' × '+money(planned)+' = '+money(planned*q)+'</span>':"")+(actual!=null?'<span class="price">real: '+q+' × '+money(actual)+' = '+money(actual*q)+'</span>':"")+'</div>'+action+'</div><button class="delete" data-action="delete" data-id="'+esc(x.id)+'" type="button">×</button></div>'}
-function renderList(){const a=filtered();$("list").innerHTML=a.length?a.map(listRow).join(""): '<div class="empty"><span class="emoji">🛍️</span><strong>'+(currentFilter==="done"?"Aún no hay compras":"Tu lista está vacía")+'</strong><span>Añade algo que necesitemos para casa.</span></div>'}
-function renderShop(){const selected=items.filter(x=>!x.done&&x.in_shopping);const bought=items.filter(x=>x.done&&x.last_shopping);const total=bought.reduce((s,x)=>s+(Number(x.actual_price)||0)*(Number(x.quantity)||1),0);const totalSelected=selected.length+bought.length;$("shopTotal").textContent=money(total);$("progressBar").style.width=(totalSelected?bought.length/totalSelected*100:0)+"%";$("progressText").textContent=bought.length+" de "+totalSelected+" productos de esta compra";$("shopList").innerHTML=selected.length?selected.map(x=>{const q=Number(x.quantity)||1;return '<div class="item"><button class="check" data-action="buy" data-id="'+esc(x.id)+'" type="button">✓</button><div><div class="product-line"><span class="product-name">'+esc(x.name)+'</span><span class="tag">'+esc(x.category||"🛒 General")+'</span><span class="tag">×'+q+'</span></div><div class="meta"><span class="tag">'+(x.person==="Pol"?"👨 Pol":"👩 Alyssa")+'</span>'+(x.planned_price!=null?'<span class="price">prev. '+q+' × '+money(x.planned_price)+' = '+money(Number(x.planned_price)*q)+'</span>':"")+'</div><button class="shop-remove" data-action="removeShop" data-id="'+esc(x.id)+'" type="button">Quitar de esta compra</button></div><div><input class="actual-price" data-price-id="'+esc(x.id)+'" data-qty="'+q+'" type="number" min="0" step="0.01" placeholder="€/unidad"><div class="unit-total" data-total-id="'+esc(x.id)+'">— total</div></div></div>'}).join(""):'<div class="empty"><span class="emoji">🛒</span><strong>No hay nada en la compra de hoy</strong><span>Ve a 💡 Ideas y pulsa «Añadir a compra» en lo que queráis comprar ahora.</span></div>';$("shopBought").innerHTML=bought.length?bought.map(x=>{const q=Number(x.quantity)||1;const unit=x.actual_price!=null?money(x.actual_price):"sin precio";return '<div class="undo-row"><span class="undo-name">'+esc(x.name)+' · ×'+q+' · '+unit+'</span><button class="undo-btn" data-action="undo" data-id="'+esc(x.id)+'" type="button">↶ Deshacer</button></div>'}).join(""): '<div style="font-size:10px;color:var(--muted);padding:5px 2px 9px">Todavía no hay productos comprados en esta compra.</div>'}
+function categoryKey(cat){return String(cat||"🛒 General").trim()}
+const bucketOrder=["🍳 Cocina","🛁 Baño","🛋️ Salón","🛏️ Dormitorio","🧽 Limpieza","🥑 Alimentación","🐾 Mascotas","🪑 Muebles","🕯️ Decoración","🛒 General"];
+function categoryGroups(arr){const groups={};arr.forEach(x=>{const k=categoryKey(x.category);(groups[k]||(groups[k]=[])).push(x)});return bucketOrder.filter(k=>groups[k]).map(k=>[k,groups[k]]).concat(Object.keys(groups).filter(k=>!bucketOrder.includes(k)).map(k=>[k,groups[k]]))}
+function ideaRow(x){const q=Number(x.quantity)||1;const planned=x.planned_price!=null&&x.planned_price!==""?Number(x.planned_price):null;const actual=x.actual_price!=null&&x.actual_price!==""?Number(x.actual_price):null;const action=!x.done?(x.in_shopping?'<button class="shop-select selected" data-action="removeShop" data-id="'+esc(x.id)+'" type="button">✓ En esta compra</button>':'<button class="shop-select" data-action="addShop" data-id="'+esc(x.id)+'" type="button">🛒 Añadir a compra</button>'):'';return '<div class="item '+(x.done?"done":"")+'"><button class="check" data-action="toggle" data-id="'+esc(x.id)+'" type="button">'+(x.done?"✓":"")+'</button><div><div class="product-line"><span class="product-name">'+esc(x.name)+'</span><span class="tag">×'+q+'</span></div><div class="meta"><span class="tag">'+(x.person==="Pol"?"👨 Pol":"👩 Alyssa")+'</span>'+(planned!=null?'<span class="price">'+q+' × '+money(planned)+' = '+money(planned*q)+'</span>':"")+(actual!=null?'<span class="price">real '+q+' × '+money(actual)+' = '+money(actual*q)+'</span>':"")+'</div><div class="idea-actions">'+action+'</div></div><button class="delete" data-action="delete" data-id="'+esc(x.id)+'" type="button">×</button></div>'}
+function renderList(){const a=filtered();const groups=categoryGroups(a);if(!groups.length){$("list").innerHTML='<div class="empty"><span class="emoji">🏡</span><strong>'+ (currentFilter==="done"?"Aún no hay cosas compradas":"No hay nada pendiente todavía") +'</strong><span>Añade lo que falte en cada zona de la casa.</span></div>';return}$("list").innerHTML=groups.map(([cat,arr])=>'<section class="bucket"><div class="bucket-head"><span class="bucket-title">'+esc(cat)+'</span><span class="bucket-count">'+arr.length+' '+(arr.length===1?"pendiente":"pendientes")+'</span></div>'+arr.map(ideaRow).join('')+'</section>').join('')}
+function pickerRow(x){const q=Number(x.quantity)||1;return '<div class="picker-item"><div><div class="picker-name">'+esc(x.name)+' · ×'+q+'</div><div class="picker-meta">'+esc(x.category||"🛒 General")+'</div></div><button class="picker-btn '+(x.in_shopping?"selected":"")+'" data-action="'+(x.in_shopping?"removeShop":"addShop")+'" data-id="'+esc(x.id)+'" type="button">'+(x.in_shopping?"✓ Añadido":"＋ Añadir")+'</button></div>'}
+function renderPicker(){const pending=items.filter(x=>!x.done);const groups=categoryGroups(pending);$("shopPicker").innerHTML=groups.length?groups.map(([cat,arr])=>'<div class="picker-group"><div class="picker-title">'+esc(cat)+'</div>'+arr.map(pickerRow).join('')+'</div>').join(''):'<div class="bucket-empty">No hay ideas pendientes. Añade primero algo en 💡 Ideas.</div>'}
+function renderShop(){renderPicker();const selected=items.filter(x=>!x.done&&x.in_shopping);const bought=items.filter(x=>x.done&&x.last_shopping);const total=bought.reduce((s,x)=>s+(Number(x.actual_price)||0)*(Number(x.quantity)||1),0);const totalSelected=selected.length+bought.length;$("shopTotal").textContent=money(total);$("progressBar").style.width=(totalSelected?bought.length/totalSelected*100:0)+"%";$("progressText").textContent=bought.length+" de "+totalSelected+" productos de esta compra";$("shopList").innerHTML=selected.length?selected.map(x=>{const q=Number(x.quantity)||1;return '<div class="item"><button class="check" data-action="buy" data-id="'+esc(x.id)+'" type="button">✓</button><div><div class="product-line"><span class="product-name">'+esc(x.name)+'</span><span class="tag">'+esc(x.category||"🛒 General")+'</span><span class="tag">×'+q+'</span></div><div class="meta"><span class="tag">'+(x.person==="Pol"?"👨 Pol":"👩 Alyssa")+'</span>'+(x.planned_price!=null?'<span class="price">prev. '+q+' × '+money(x.planned_price)+' = '+money(Number(x.planned_price)*q)+'</span>':"")+'</div><button class="shop-remove" data-action="removeShop" data-id="'+esc(x.id)+'" type="button">Quitar de esta compra</button></div><div><input class="actual-price" data-price-id="'+esc(x.id)+'" data-qty="'+q+'" type="number" min="0" step="0.01" placeholder="€/unidad"><div class="unit-total" data-total-id="'+esc(x.id)+'">— total</div></div></div>'}).join(''):'<div class="empty"><span class="emoji">🛒</span><strong>No hay nada en la compra de hoy</strong><span>Arriba puedes añadir solo las cosas que quieras comprar ahora.</span></div>';$('shopBought').innerHTML=bought.length?bought.map(x=>{const q=Number(x.quantity)||1;const unit=x.actual_price!=null?money(x.actual_price):"sin precio";return '<div class="undo-row"><span class="undo-name">'+esc(x.name)+' · ×'+q+' · '+unit+'</span><button class="undo-btn" data-action="undo" data-id="'+esc(x.id)+'" type="button">↶ Deshacer</button></div>'}).join(''):'<div style="font-size:10px;color:var(--muted);padding:5px 2px 9px">Todavía no hay productos comprados en esta compra.</div>'}
 function hist(){try{const x=JSON.parse(localStorage.getItem("our-home-history")||"[]");return Array.isArray(x)?x:[]}catch(e){return[]}}
-function renderHistory(){const h=hist();$("historyList").innerHTML=h.length?h.map((x,i)=>'<div style="padding:13px 10px;border-bottom:1px solid var(--line)"><div style="display:flex;justify-content:space-between;gap:10px"><div><strong style="font-size:13px">'+esc(x.date)+'</strong><div style="font-size:10px;color:var(--muted);margin-top:3px">'+x.count+' unidades</div></div><strong style="color:var(--terra-dark)">'+money(x.total)+'</strong></div><button class="secondary" style="width:100%;margin-top:9px" data-action="repeat" data-index="'+i+'" type="button">↻ Añadir estos productos otra vez</button></div>').join(""):'<div class="empty"><span class="emoji">🧾</span><strong>Aún no hay compras anteriores</strong><span>Cuando terminéis una compra aparecerá aquí.</span></div>'}
+function renderHistory(){const h=hist();$("historyList").innerHTML=h.length?h.map((x,i)=>'<div style="padding:13px 10px;border-bottom:1px solid var(--line)"><div style="display:flex;justify-content:space-between;gap:10px"><div><strong style="font-size:13px">'+esc(x.date)+'</strong><div style="font-size:10px;color:var(--muted);margin-top:3px">'+x.count+' unidades</div></div><strong style="color:var(--terra-dark)">'+money(x.total)+'</strong></div><div style="display:flex;gap:12px;align-items:center;margin-top:8px"><button class="secondary" style="flex:1" data-action="repeat" data-index="'+i+'" type="button">↻ Añadir otra vez</button><button class="history-delete" data-action="deleteHistory" data-index="'+i+'" type="button">🗑 Borrar esta compra</button></div></div>').join(''):'<div class="empty"><span class="emoji">🧾</span><strong>Aún no hay compras anteriores</strong><span>Cuando terminéis una compra aparecerá aquí.</span></div>'}
 function addItem(){const name=$("productInput").value.trim();if(!name){$("productInput").focus();return}const q=Math.max(1,parseInt($("quantityInput").value||"1",10)||1);const p=$("plannedPriceInput").value===""?null:Number($("plannedPriceInput").value);const x={id:uid(),name,category:$("categoryInput").value,planned_price:p,actual_price:null,quantity:q,person:$("personInput").value,done:false,in_shopping:false,last_shopping:false,created_at:new Date().toISOString()};items.unshift(x);saveLocal();render();$("productInput").value="";$("plannedPriceInput").value="";$("quantityInput").value="1";$("productInput").focus();toast("Añadido a la lista ♡");syncInsert(x)}
 async function addToShop(id){const x=items.find(a=>a.id===id);if(!x)return;x.in_shopping=true;x.last_shopping=true;saveLocal();render();await remoteUpdate(id,{in_shopping:true,last_shopping:true});toast("Añadido a la compra 🛒")}
 async function removeFromShop(id){const x=items.find(a=>a.id===id);if(!x)return;x.in_shopping=false;saveLocal();render();await remoteUpdate(id,{in_shopping:false});toast("Quitado de la compra")}
@@ -303,14 +325,15 @@ async function toggle(id){const x=items.find(a=>a.id===id);if(!x)return;x.done=!
 async function buy(id){const el=document.querySelector('[data-price-id="'+CSS.escape(id)+'"]');const value=el&&el.value!==""?Number(el.value):null;const x=items.find(a=>a.id===id);if(!x)return;x.done=true;x.actual_price=value;x.in_shopping=false;x.last_shopping=true;saveLocal();render();await remoteUpdate(id,{done:true,actual_price:value,in_shopping:false,last_shopping:true});toast(value!=null?"Añadido al total ♡":"Marcado como comprado")}
 async function undo(id){const x=items.find(a=>a.id===id);if(!x)return;x.done=false;x.actual_price=null;x.in_shopping=true;x.last_shopping=true;saveLocal();render();await remoteUpdate(id,{done:false,actual_price:null,in_shopping:true,last_shopping:true});toast("Compra deshecha ♡")}
 function clearHistory(){if(!hist().length)return;if(!confirm("¿Borrar todo el historial de compras?"))return;localStorage.removeItem("our-home-history");renderHistory();toast("Historial borrado")}
+function deleteHistory(i){const h=hist();if(!h[i])return;if(!confirm("¿Borrar la compra del "+h[i].date+" del historial?"))return;h.splice(i,1);localStorage.setItem("our-home-history",JSON.stringify(h));renderHistory();toast("Compra eliminada del historial")}
 function updateUnitTotal(input){const id=input.dataset.priceId;const q=Number(input.dataset.qty)||1;const value=input.value===""?null:Number(input.value);const out=document.querySelector('[data-total-id="'+CSS.escape(id)+'"]');if(!out)return;out.textContent=value==null?"— total":money(value*q)+" total"}
 async function del(id){items=items.filter(x=>x.id!==id);saveLocal();render();if(supabaseClient)await supabaseClient.from("shopping_items").delete().eq("id",id);toast("Eliminado")}
 async function clearDone(){const ids=items.filter(x=>x.done).map(x=>x.id);if(!ids.length)return;items=items.filter(x=>!x.done);saveLocal();render();if(supabaseClient)await supabaseClient.from("shopping_items").delete().in("id",ids);toast("Comprados borrados ♡")}
-function finish(){const b=items.filter(x=>x.done);if(!b.length){toast("Aún no hay productos comprados");return}const total=b.reduce((s,x)=>s+(Number(x.actual_price)||0)*(Number(x.quantity)||1),0);const h=hist();h.unshift({date:new Intl.DateTimeFormat("es-ES",{dateStyle:"medium"}).format(new Date()),count:b.reduce((s,x)=>s+(Number(x.quantity)||1),0),total,items:b.map(x=>({...x}))});localStorage.setItem("our-home-history",JSON.stringify(h.slice(0,20)));currentTab="history";render();toast("Compra guardada en el historial ♡")}
+async function finish(){const b=items.filter(x=>x.done&&x.last_shopping);if(!b.length){toast("Aún no hay productos comprados en esta compra");return}const total=b.reduce((s,x)=>s+(Number(x.actual_price)||0)*(Number(x.quantity)||1),0);const h=hist();h.unshift({date:new Intl.DateTimeFormat("es-ES",{dateStyle:"medium"}).format(new Date()),count:b.reduce((s,x)=>s+(Number(x.quantity)||1),0),total,items:b.map(x=>({...x}))});localStorage.setItem("our-home-history",JSON.stringify(h.slice(0,20)));for(const x of b){x.last_shopping=false;x.in_shopping=false;await remoteUpdate(x.id,{last_shopping:false,in_shopping:false})}saveLocal();currentTab="history";render();toast("Compra guardada en el historial ♡")}
 function repeat(i){const h=hist()[i];if(!h)return;const now=new Date().toISOString();const c=h.items.map(x=>({...x,id:uid(),done:false,actual_price:null,in_shopping:false,last_shopping:false,created_at:now}));items=[...c,...items];saveLocal();render();c.forEach(syncInsert);toast("Productos añadidos ♡")}
 function loadSupabase(){const s=document.createElement("script");s.src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2";s.async=true;s.onload=connect;s.onerror=()=>status(false,"Lista local · sincronización no disponible");document.head.appendChild(s)}
 async function connect(){try{if(!window.supabase){status(false,"Lista local · sincronización no disponible");return}supabaseClient=window.supabase.createClient(SUPABASE_URL,SUPABASE_KEY);const r=await supabaseClient.from("shopping_items").select("*").order("created_at",{ascending:false});if(r.error){console.error(r.error);status(false,"Lista local · revisa la sincronización");return}const remote=(r.data||[]).map(x=>({...x,in_shopping:!!x.in_shopping,last_shopping:!!x.last_shopping}));const ids=new Set(remote.map(x=>x.id));const localOnly=items.filter(x=>!ids.has(x.id));if(localOnly.length){const clean=localOnly.map(x=>({id:x.id,name:x.name,category:x.category||"🛒 General",planned_price:x.planned_price,actual_price:x.actual_price,done:!!x.done,created_at:x.created_at||new Date().toISOString(),quantity:Number(x.quantity)||1,person:x.person||"Alyssa",in_shopping:!!x.in_shopping,last_shopping:!!x.last_shopping}));await supabaseClient.from("shopping_items").insert(clean)}items=[...remote,...localOnly];saveLocal();render();supabaseClient.channel("shopping-live").on("postgres_changes",{event:"*",schema:"public",table:"shopping_items"},p=>{const r0=p.new||p.old;if(!r0||!r0.id)return;const r={...r0,in_shopping:!!r0.in_shopping,last_shopping:!!r0.last_shopping};if(p.eventType==="INSERT"&&!items.some(x=>x.id===r.id))items.unshift(r);if(p.eventType==="UPDATE"){const i=items.findIndex(x=>x.id===r.id);if(i>=0)items[i]=r;else items.unshift(r)}if(p.eventType==="DELETE")items=items.filter(x=>x.id!==r.id);saveLocal();render()}).subscribe(st=>{if(st==="SUBSCRIBED")status(true,"Sincronizado · compartido")})}catch(e){console.error(e);status(false,"Lista local · sincronización no disponible")}}
-document.addEventListener("click",e=>{const t=e.target.closest(".tab");if(t){currentTab=t.dataset.tab;render();return}const f=e.target.closest(".filter");if(f){currentFilter=f.dataset.filter;document.querySelectorAll(".filter").forEach(x=>x.classList.remove("active"));f.classList.add("active");renderList();return}const a=e.target.closest("[data-action]");if(!a)return;const id=a.dataset.id;if(a.dataset.action==="toggle")toggle(id);else if(a.dataset.action==="buy")buy(id);else if(a.dataset.action==="undo")undo(id);else if(a.dataset.action==="addShop")addToShop(id);else if(a.dataset.action==="removeShop")removeFromShop(id);else if(a.dataset.action==="delete")del(id);else if(a.dataset.action==="repeat")repeat(Number(a.dataset.index))});
+document.addEventListener("click",e=>{const t=e.target.closest(".tab");if(t){currentTab=t.dataset.tab;render();return}const f=e.target.closest(".filter");if(f){currentFilter=f.dataset.filter;document.querySelectorAll(".filter").forEach(x=>x.classList.remove("active"));f.classList.add("active");renderList();return}const a=e.target.closest("[data-action]");if(!a)return;const id=a.dataset.id;if(a.dataset.action==="toggle")toggle(id);else if(a.dataset.action==="buy")buy(id);else if(a.dataset.action==="undo")undo(id);else if(a.dataset.action==="addShop")addToShop(id);else if(a.dataset.action==="removeShop")removeFromShop(id);else if(a.dataset.action==="delete")del(id);else if(a.dataset.action==="repeat")repeat(Number(a.dataset.index));else if(a.dataset.action==="deleteHistory")deleteHistory(Number(a.dataset.index))});
 $("addBtn").addEventListener("click",addItem);$("productInput").addEventListener("keydown",e=>{if(e.key==="Enter")addItem()});$("plannedPriceInput").addEventListener("keydown",e=>{if(e.key==="Enter")addItem()});$("clearDone").addEventListener("click",clearDone);$("clearHistory").addEventListener("click",clearHistory);$("backToList").addEventListener("click",()=>{currentTab="list";render()});$("finishShopping").addEventListener("click",finish);$("budgetInput").addEventListener("change",()=>{localStorage.setItem("our-home-budget",String(Number($("budgetInput").value||0)));renderBudget()});$("quantityInput").addEventListener("input",()=>$("quantityValue").textContent=$("quantityInput").value);document.addEventListener("input",e=>{if(e.target.matches(".actual-price"))updateUnitTotal(e.target)});
 render();status(false,"Preparando sincronización…");loadSupabase();
 })();
