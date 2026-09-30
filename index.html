@@ -52,6 +52,10 @@
     input:focus,select:focus{border-color:var(--rose);box-shadow:0 0 0 4px rgba(223,181,170,.16)}
     .add-btn{border:0;background:var(--terra);color:white;min-width:50px;border-radius:15px;font-size:22px;box-shadow:0 8px 18px rgba(169,99,80,.2)}
     .details-row{display:grid;grid-template-columns:1fr 105px;gap:9px;margin-top:9px}
+    .quantity-box{display:flex;align-items:center;gap:10px;background:var(--white);border:1px solid var(--line);border-radius:15px;padding:8px 12px}
+    .quantity-box label{font-size:10px;color:var(--muted);white-space:nowrap}
+    .quantity-range{flex:1;accent-color:var(--terra);min-width:0}
+    .quantity-value{min-width:28px;text-align:center;font-weight:800;color:var(--terra-dark)}
     .hint{font-size:10px;color:var(--muted);margin:8px 3px 0}
 
     .toolbar{padding:0 2px 12px;display:flex;gap:8px;overflow:auto;scrollbar-width:none}
@@ -90,7 +94,7 @@
 
     .bottom{display:flex;justify-content:space-between;align-items:center;padding:13px 4px 0;color:var(--muted);font-size:11px}
     .clear{border:0;background:none;color:var(--terra-dark);font-size:11px;font-weight:700}
-    .toast{position:fixed;left:50%;bottom:22px;transform:translate(-50%,20px);background:#403532;color:#fff;padding:10px 15px;border-radius:999px;font-size:12px;opacity:0;pointer-events:none;transition:.25s;z-index:20}
+    .shop-select,.shop-remove{border:0;border-radius:999px;padding:6px 9px;margin-top:7px;background:var(--card2);color:var(--terra-dark);font-size:10px;font-weight:800}.shop-select.selected{background:#dfe8db;color:#65755d}.shop-remove{background:transparent;padding:5px 0;color:var(--muted);font-weight:700}.bought-section{margin-top:12px;padding:12px}.bought-title{font-size:10px;font-weight:850;letter-spacing:.08em;color:var(--muted);margin-bottom:8px}.undo-row{display:flex;align-items:center;justify-content:space-between;gap:8px;padding:8px 0;border-top:1px solid var(--line);font-size:11px}.undo-name{color:var(--muted)}.undo-btn{border:0;border-radius:999px;padding:7px 9px;background:var(--card2);color:var(--text);font-size:10px;font-weight:800}.toast{position:fixed;left:50%;bottom:22px;transform:translate(-50%,20px);background:#403532;color:#fff;padding:10px 15px;border-radius:999px;font-size:12px;opacity:0;pointer-events:none;transition:.25s;z-index:20}
     .toast.show{opacity:1;transform:translate(-50%,0)}
 
     .setup{padding:18px;margin-top:8px}
@@ -114,6 +118,13 @@
     body.shopping-mode .actual-price{font-size:14px!important;padding:10px 8px!important}
     body.shopping-mode #shopList .item.done{display:none}
     .shop-total-pill{display:inline-flex;align-items:center;gap:5px;padding:5px 8px;border-radius:999px;background:var(--card2);font-size:10px;color:var(--muted);margin-top:5px}
+    .unit-total{font-size:10px;color:var(--terra-dark);font-weight:750;margin-top:3px}
+    .bought-section{margin-top:12px;padding:12px 12px 4px}
+    .bought-title{font-size:11px;color:var(--muted);font-weight:800;margin:0 0 5px 2px}
+    .undo-row{display:flex;align-items:center;justify-content:space-between;gap:10px;padding:9px 2px;border-top:1px solid rgba(234,219,210,.65)}
+    .undo-name{font-size:12px;font-weight:700;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+    .undo-btn,.clear-history{border:0;background:transparent;color:var(--terra-dark);font-size:11px;font-weight:800;white-space:nowrap}
+    .history-actions{display:flex;justify-content:flex-end;margin-top:10px}
 
     .hidden{display:none!important}
     @media(min-width:600px){.app{padding-top:45px}}
@@ -125,8 +136,8 @@
   <header>
     <div>
       <p class="eyebrow">Nuestro pequeño hogar</p>
-      <h1>Lista de compra</h1>
-      <p class="subtitle">Pequeñas cosas que hacen nuestra casa nuestra ♡</p>
+      <h1>Ideas para casa</h1>
+      <p class="subtitle">Cosas que queremos comprar, mejorar o dejar pendientes ♡</p>
     </div>
     <div class="home-icon">🏡</div>
   </header>
@@ -134,14 +145,14 @@
   <p class="connection"><span><i class="dot" id="connectionDot"></i><span id="connectionText">Preparando sincronización...</span></span></p>
 
   <div class="tabs">
-    <button class="tab active" data-tab="list">📝 Lista</button>
+    <button class="tab active" data-tab="list">💡 Ideas</button>
     <button class="tab" data-tab="shop">🛒 Comprando</button>
     <button class="tab" data-tab="history">🧾 Historial</button>
   </div>
 
   <section id="listView">
     <div class="summary">
-      <div class="stat"><span class="stat-number" id="totalCount">0</span><span class="stat-label">productos</span></div>
+      <div class="stat"><span class="stat-number" id="totalCount">0</span><span class="stat-label">ideas</span></div>
       <div class="stat"><span class="stat-number" id="pendingCount">0</span><span class="stat-label">pendientes</span></div>
       <div class="stat"><span class="stat-number" id="listPrice">—</span><span class="stat-label">presupuesto</span></div>
     </div>
@@ -160,7 +171,7 @@
 
     <section class="card add-card">
       <div class="add-row">
-        <input id="productInput" type="text" placeholder="¿Qué necesitamos? ✨" autocomplete="off">
+        <input id="productInput" type="text" placeholder="¿Qué queremos tener pendiente? ✨" autocomplete="off">
         <button class="add-btn" id="addBtn">+</button>
       </div>
       <div class="details-row">
@@ -172,20 +183,26 @@
           <option value="🍳 Cocina">🍳 Cocina</option>
           <option value="🛏️ Dormitorio">🛏️ Dormitorio</option>
           <option value="🕯️ Decoración">🕯️ Decoración</option>
+          <option value="🪑 Muebles">🪑 Muebles</option>
           <option value="🐾 Mascotas">🐾 Mascotas</option>
         </select>
-        <input id="plannedPriceInput" type="number" min="0" step="0.01" placeholder="Precio €">
+        <input id="plannedPriceInput" type="number" min="0" step="0.01" placeholder="€/unidad">
       </div>
       <div class="details-row">
-        <input id="quantityInput" type="number" min="1" step="1" value="1" placeholder="Cantidad">
+        <div class="quantity-box">
+          <label for="quantityInput">Cantidad</label>
+          <input id="quantityInput" class="quantity-range" type="range" min="1" max="10" step="1" value="1">
+          <span class="quantity-value" id="quantityValue">1</span>
+        </div>
         <select id="personInput">
           <option value="Alyssa">👩 Alyssa</option>
           <option value="Pol">👨 Pol</option>
         </select>
       </div>
-      <p class="hint">💡 El precio es opcional. Si aún no sabéis cuánto cuesta, dejadlo vacío.</p>
+      <p class="hint">💡 El precio es por unidad. Si ponéis 2 € y cantidad 2, el estimado será 4 €.</p>
     </section>
 
+    <p class="hint" style="margin:0 3px 10px">💡 Esta pestaña es vuestra lista de ideas. Solo lo que marquéis como <strong>Añadir a compra</strong> aparecerá en 🛒 Comprando.</p>
     <nav class="toolbar">
       <button class="filter active" data-filter="all">Todo</button>
       <button class="filter" data-filter="pending">Pendiente</button>
@@ -222,17 +239,22 @@
     <section class="card list-card">
       <div id="shopList"></div>
     </section>
+    <section class="card bought-section" id="shopBoughtSection">
+      <div class="bought-title">COMPRADOS · puedes deshacer cualquier error</div>
+      <div id="shopBought"></div>
+    </section>
   </section>
 
   <section id="historyView" class="hidden">
     <section class="card" style="padding:16px;margin-bottom:14px">
-      <div style="display:flex;justify-content:space-between;align-items:center">
+      <div style="display:flex;justify-content:space-between;align-items:center;gap:10px">
         <div>
           <h2 style="font-family:Georgia,serif;font-weight:500;margin:0;font-size:22px">Compras anteriores</h2>
           <p style="font-size:11px;color:var(--muted);margin:5px 0 0">Recupera rápidamente lo que compráis habitualmente.</p>
         </div>
         <span style="font-size:25px">🧾</span>
       </div>
+      <div class="history-actions"><button class="clear-history" id="clearHistory" type="button">Borrar historial</button></div>
     </section>
     <section class="card list-card"><div id="historyList"></div></section>
   </section>
@@ -253,7 +275,7 @@
 const SUPABASE_URL="https://esjkabcbxnrcklcwncap.supabase.co";
 const SUPABASE_KEY="sb_publishable_hFUuotzrcj574thQhQQedA_bbjmomnV";
 const LOCAL_KEY="nuestro-hogar-shopping-v4";
-let items=loadLocal(), currentTab="list", currentFilter="all", supabaseClient=null;
+let items=loadLocal().map(x=>({...x,in_shopping:!!x.in_shopping,last_shopping:!!x.last_shopping})), currentTab="list", currentFilter="all", supabaseClient=null;
 const $=id=>document.getElementById(id);
 function loadLocal(){try{const x=JSON.parse(localStorage.getItem(LOCAL_KEY)||"[]");return Array.isArray(x)?x:[]}catch(e){return[]}}
 function saveLocal(){try{localStorage.setItem(LOCAL_KEY,JSON.stringify(items))}catch(e){}}
@@ -267,24 +289,29 @@ function renderTabs(){["listView","shopView","historyView"].forEach(id=>$(id).cl
 function renderStats(){const pending=items.filter(x=>!x.done).length;const planned=items.reduce((s,x)=>s+(Number(x.planned_price)||0)*(Number(x.quantity)||1),0);$("totalCount").textContent=items.length;$("pendingCount").textContent=pending;$("listPrice").textContent=planned?money(planned):"—";$("statusText").textContent=items.length?pending+" "+(pending===1?"producto pendiente":"productos pendientes"):"La lista está vacía"}
 function renderBudget(){const b=Number(localStorage.getItem("our-home-budget")||0);$("budgetInput").value=b||"";const p=items.reduce((s,x)=>s+(Number(x.planned_price)||0)*(Number(x.quantity)||1),0);$("budgetBar").style.width=(b?Math.min(100,p/b*100):0)+"%";$("budgetText").textContent=b?money(p)+" estimados de "+money(b)+" · "+(p<=b?money(b-p)+" disponibles":money(p-b)+" por encima"):"Sin presupuesto definido"}
 function filtered(){return currentFilter==="pending"?items.filter(x=>!x.done):currentFilter==="done"?items.filter(x=>x.done):items}
-function listRow(x){return '<div class="item '+(x.done?"done":"")+'"><button class="check" data-action="toggle" data-id="'+esc(x.id)+'" type="button">'+(x.done?"✓":"")+'</button><div><div class="product-line"><span class="product-name">'+esc(x.name)+'</span><span class="tag">'+esc(x.category||"🛒 General")+'</span><span class="tag">×'+(Number(x.quantity)||1)+'</span></div><div class="meta"><span class="tag">'+(x.person==="Pol"?"👨 Pol":"👩 Alyssa")+'</span>'+(x.planned_price!=null?'<span class="price">prev. '+money(x.planned_price)+'</span>':"")+(x.actual_price!=null?'<span class="price">real '+money(x.actual_price)+'</span>':"")+'</div></div><button class="delete" data-action="delete" data-id="'+esc(x.id)+'" type="button">×</button></div>'}
+function listRow(x){const q=Number(x.quantity)||1;const planned=x.planned_price!=null&&x.planned_price!==""?Number(x.planned_price):null;const actual=x.actual_price!=null&&x.actual_price!==""?Number(x.actual_price):null;let action="";if(!x.done){action=x.in_shopping?'<button class="shop-select selected" data-action="removeShop" data-id="'+esc(x.id)+'" type="button">✓ En compra</button>':'<button class="shop-select" data-action="addShop" data-id="'+esc(x.id)+'" type="button">＋ Añadir a compra</button>'}return '<div class="item '+(x.done?"done":"")+'"><button class="check" data-action="toggle" data-id="'+esc(x.id)+'" type="button">'+(x.done?"✓":"")+'</button><div><div class="product-line"><span class="product-name">'+esc(x.name)+'</span><span class="tag">'+esc(x.category||"🛒 General")+'</span><span class="tag">×'+q+'</span></div><div class="meta"><span class="tag">'+(x.person==="Pol"?"👨 Pol":"👩 Alyssa")+'</span>'+(planned!=null?'<span class="price">'+q+' × '+money(planned)+' = '+money(planned*q)+'</span>':"")+(actual!=null?'<span class="price">real: '+q+' × '+money(actual)+' = '+money(actual*q)+'</span>':"")+'</div>'+action+'</div><button class="delete" data-action="delete" data-id="'+esc(x.id)+'" type="button">×</button></div>'}
 function renderList(){const a=filtered();$("list").innerHTML=a.length?a.map(listRow).join(""): '<div class="empty"><span class="emoji">🛍️</span><strong>'+(currentFilter==="done"?"Aún no hay compras":"Tu lista está vacía")+'</strong><span>Añade algo que necesitemos para casa.</span></div>'}
-function renderShop(){const active=items.filter(x=>!x.done);const bought=items.filter(x=>x.done);const total=bought.reduce((s,x)=>s+(Number(x.actual_price)||0)*(Number(x.quantity)||1),0);$("shopTotal").textContent=money(total);$("progressBar").style.width=(items.length?bought.length/items.length*100:0)+"%";$("progressText").textContent=bought.length+" de "+items.length+" productos comprados";$("shopList").innerHTML=active.length?active.map(x=>'<div class="item"><button class="check" data-action="buy" data-id="'+esc(x.id)+'" type="button">✓</button><div><div class="product-line"><span class="product-name">'+esc(x.name)+'</span><span class="tag">'+esc(x.category||"🛒 General")+'</span><span class="tag">×'+(Number(x.quantity)||1)+'</span></div><div class="meta"><span class="tag">'+(x.person==="Pol"?"👨 Pol":"👩 Alyssa")+'</span>'+(x.planned_price!=null?'<span class="price">prev. '+money(x.planned_price)+'</span>':"")+'</div></div><input class="actual-price" data-price-id="'+esc(x.id)+'" type="number" min="0" step="0.01" placeholder="€ real"></div>').join(""): '<div class="empty"><span class="emoji">🛒</span><strong>¡Todo comprado!</strong><span>El total de esta compra es '+money(total)+'.</span></div>'}
+function renderShop(){const selected=items.filter(x=>!x.done&&x.in_shopping);const bought=items.filter(x=>x.done&&x.last_shopping);const total=bought.reduce((s,x)=>s+(Number(x.actual_price)||0)*(Number(x.quantity)||1),0);const totalSelected=selected.length+bought.length;$("shopTotal").textContent=money(total);$("progressBar").style.width=(totalSelected?bought.length/totalSelected*100:0)+"%";$("progressText").textContent=bought.length+" de "+totalSelected+" productos de esta compra";$("shopList").innerHTML=selected.length?selected.map(x=>{const q=Number(x.quantity)||1;return '<div class="item"><button class="check" data-action="buy" data-id="'+esc(x.id)+'" type="button">✓</button><div><div class="product-line"><span class="product-name">'+esc(x.name)+'</span><span class="tag">'+esc(x.category||"🛒 General")+'</span><span class="tag">×'+q+'</span></div><div class="meta"><span class="tag">'+(x.person==="Pol"?"👨 Pol":"👩 Alyssa")+'</span>'+(x.planned_price!=null?'<span class="price">prev. '+q+' × '+money(x.planned_price)+' = '+money(Number(x.planned_price)*q)+'</span>':"")+'</div><button class="shop-remove" data-action="removeShop" data-id="'+esc(x.id)+'" type="button">Quitar de esta compra</button></div><div><input class="actual-price" data-price-id="'+esc(x.id)+'" data-qty="'+q+'" type="number" min="0" step="0.01" placeholder="€/unidad"><div class="unit-total" data-total-id="'+esc(x.id)+'">— total</div></div></div>'}).join(""):'<div class="empty"><span class="emoji">🛒</span><strong>No hay nada en la compra de hoy</strong><span>Ve a 💡 Ideas y pulsa «Añadir a compra» en lo que queráis comprar ahora.</span></div>';$("shopBought").innerHTML=bought.length?bought.map(x=>{const q=Number(x.quantity)||1;const unit=x.actual_price!=null?money(x.actual_price):"sin precio";return '<div class="undo-row"><span class="undo-name">'+esc(x.name)+' · ×'+q+' · '+unit+'</span><button class="undo-btn" data-action="undo" data-id="'+esc(x.id)+'" type="button">↶ Deshacer</button></div>'}).join(""): '<div style="font-size:10px;color:var(--muted);padding:5px 2px 9px">Todavía no hay productos comprados en esta compra.</div>'}
 function hist(){try{const x=JSON.parse(localStorage.getItem("our-home-history")||"[]");return Array.isArray(x)?x:[]}catch(e){return[]}}
 function renderHistory(){const h=hist();$("historyList").innerHTML=h.length?h.map((x,i)=>'<div style="padding:13px 10px;border-bottom:1px solid var(--line)"><div style="display:flex;justify-content:space-between;gap:10px"><div><strong style="font-size:13px">'+esc(x.date)+'</strong><div style="font-size:10px;color:var(--muted);margin-top:3px">'+x.count+' unidades</div></div><strong style="color:var(--terra-dark)">'+money(x.total)+'</strong></div><button class="secondary" style="width:100%;margin-top:9px" data-action="repeat" data-index="'+i+'" type="button">↻ Añadir estos productos otra vez</button></div>').join(""):'<div class="empty"><span class="emoji">🧾</span><strong>Aún no hay compras anteriores</strong><span>Cuando terminéis una compra aparecerá aquí.</span></div>'}
-function addItem(){const name=$("productInput").value.trim();if(!name){$("productInput").focus();return}const q=Math.max(1,parseInt($("quantityInput").value||"1",10)||1);const p=$("plannedPriceInput").value===""?null:Number($("plannedPriceInput").value);const x={id:uid(),name,category:$("categoryInput").value,planned_price:p,actual_price:null,quantity:q,person:$("personInput").value,done:false,created_at:new Date().toISOString()};items.unshift(x);saveLocal();render();$("productInput").value="";$("plannedPriceInput").value="";$("quantityInput").value="1";$("productInput").focus();toast("Añadido a la lista ♡");syncInsert(x)}
+function addItem(){const name=$("productInput").value.trim();if(!name){$("productInput").focus();return}const q=Math.max(1,parseInt($("quantityInput").value||"1",10)||1);const p=$("plannedPriceInput").value===""?null:Number($("plannedPriceInput").value);const x={id:uid(),name,category:$("categoryInput").value,planned_price:p,actual_price:null,quantity:q,person:$("personInput").value,done:false,in_shopping:false,last_shopping:false,created_at:new Date().toISOString()};items.unshift(x);saveLocal();render();$("productInput").value="";$("plannedPriceInput").value="";$("quantityInput").value="1";$("productInput").focus();toast("Añadido a la lista ♡");syncInsert(x)}
+async function addToShop(id){const x=items.find(a=>a.id===id);if(!x)return;x.in_shopping=true;x.last_shopping=true;saveLocal();render();await remoteUpdate(id,{in_shopping:true,last_shopping:true});toast("Añadido a la compra 🛒")}
+async function removeFromShop(id){const x=items.find(a=>a.id===id);if(!x)return;x.in_shopping=false;saveLocal();render();await remoteUpdate(id,{in_shopping:false});toast("Quitado de la compra")}
 async function syncInsert(x){if(!supabaseClient)return;const {error}=await supabaseClient.from("shopping_items").insert(x);if(error){console.error(error);status(false,"Lista local · pendiente de sincronización")}}
 async function remoteUpdate(id,p){if(!supabaseClient)return;const {error}=await supabaseClient.from("shopping_items").update(p).eq("id",id);if(error)console.error(error)}
 async function toggle(id){const x=items.find(a=>a.id===id);if(!x)return;x.done=!x.done;saveLocal();render();await remoteUpdate(id,{done:x.done})}
-async function buy(id){const el=document.querySelector('[data-price-id="'+CSS.escape(id)+'"]');const value=el&&el.value!==""?Number(el.value):null;const x=items.find(a=>a.id===id);if(!x)return;x.done=true;x.actual_price=value;saveLocal();render();await remoteUpdate(id,{done:true,actual_price:value});toast(value!=null?"Añadido al total ♡":"Marcado como comprado")}
+async function buy(id){const el=document.querySelector('[data-price-id="'+CSS.escape(id)+'"]');const value=el&&el.value!==""?Number(el.value):null;const x=items.find(a=>a.id===id);if(!x)return;x.done=true;x.actual_price=value;x.in_shopping=false;x.last_shopping=true;saveLocal();render();await remoteUpdate(id,{done:true,actual_price:value,in_shopping:false,last_shopping:true});toast(value!=null?"Añadido al total ♡":"Marcado como comprado")}
+async function undo(id){const x=items.find(a=>a.id===id);if(!x)return;x.done=false;x.actual_price=null;x.in_shopping=true;x.last_shopping=true;saveLocal();render();await remoteUpdate(id,{done:false,actual_price:null,in_shopping:true,last_shopping:true});toast("Compra deshecha ♡")}
+function clearHistory(){if(!hist().length)return;if(!confirm("¿Borrar todo el historial de compras?"))return;localStorage.removeItem("our-home-history");renderHistory();toast("Historial borrado")}
+function updateUnitTotal(input){const id=input.dataset.priceId;const q=Number(input.dataset.qty)||1;const value=input.value===""?null:Number(input.value);const out=document.querySelector('[data-total-id="'+CSS.escape(id)+'"]');if(!out)return;out.textContent=value==null?"— total":money(value*q)+" total"}
 async function del(id){items=items.filter(x=>x.id!==id);saveLocal();render();if(supabaseClient)await supabaseClient.from("shopping_items").delete().eq("id",id);toast("Eliminado")}
 async function clearDone(){const ids=items.filter(x=>x.done).map(x=>x.id);if(!ids.length)return;items=items.filter(x=>!x.done);saveLocal();render();if(supabaseClient)await supabaseClient.from("shopping_items").delete().in("id",ids);toast("Comprados borrados ♡")}
 function finish(){const b=items.filter(x=>x.done);if(!b.length){toast("Aún no hay productos comprados");return}const total=b.reduce((s,x)=>s+(Number(x.actual_price)||0)*(Number(x.quantity)||1),0);const h=hist();h.unshift({date:new Intl.DateTimeFormat("es-ES",{dateStyle:"medium"}).format(new Date()),count:b.reduce((s,x)=>s+(Number(x.quantity)||1),0),total,items:b.map(x=>({...x}))});localStorage.setItem("our-home-history",JSON.stringify(h.slice(0,20)));currentTab="history";render();toast("Compra guardada en el historial ♡")}
-function repeat(i){const h=hist()[i];if(!h)return;const now=new Date().toISOString();const c=h.items.map(x=>({...x,id:uid(),done:false,actual_price:null,created_at:now}));items=[...c,...items];saveLocal();render();c.forEach(syncInsert);toast("Productos añadidos ♡")}
+function repeat(i){const h=hist()[i];if(!h)return;const now=new Date().toISOString();const c=h.items.map(x=>({...x,id:uid(),done:false,actual_price:null,in_shopping:false,last_shopping:false,created_at:now}));items=[...c,...items];saveLocal();render();c.forEach(syncInsert);toast("Productos añadidos ♡")}
 function loadSupabase(){const s=document.createElement("script");s.src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2";s.async=true;s.onload=connect;s.onerror=()=>status(false,"Lista local · sincronización no disponible");document.head.appendChild(s)}
-async function connect(){try{if(!window.supabase){status(false,"Lista local · sincronización no disponible");return}supabaseClient=window.supabase.createClient(SUPABASE_URL,SUPABASE_KEY);const r=await supabaseClient.from("shopping_items").select("*").order("created_at",{ascending:false});if(r.error){console.error(r.error);status(false,"Lista local · revisa la sincronización");return}const remote=r.data||[];const ids=new Set(remote.map(x=>x.id));const localOnly=items.filter(x=>!ids.has(x.id));if(localOnly.length){const clean=localOnly.map(x=>({id:x.id,name:x.name,category:x.category||"🛒 General",planned_price:x.planned_price,actual_price:x.actual_price,done:!!x.done,created_at:x.created_at||new Date().toISOString(),quantity:Number(x.quantity)||1,person:x.person||"Alyssa"}));await supabaseClient.from("shopping_items").insert(clean)}items=[...remote,...localOnly];saveLocal();render();supabaseClient.channel("shopping-live").on("postgres_changes",{event:"*",schema:"public",table:"shopping_items"},p=>{const r=p.new||p.old;if(!r||!r.id)return;if(p.eventType==="INSERT"&&!items.some(x=>x.id===r.id))items.unshift(r);if(p.eventType==="UPDATE"){const i=items.findIndex(x=>x.id===r.id);if(i>=0)items[i]=r;else items.unshift(r)}if(p.eventType==="DELETE")items=items.filter(x=>x.id!==r.id);saveLocal();render()}).subscribe(st=>{if(st==="SUBSCRIBED")status(true,"Sincronizado · compartido")})}catch(e){console.error(e);status(false,"Lista local · sincronización no disponible")}}
-document.addEventListener("click",e=>{const t=e.target.closest(".tab");if(t){currentTab=t.dataset.tab;render();return}const f=e.target.closest(".filter");if(f){currentFilter=f.dataset.filter;document.querySelectorAll(".filter").forEach(x=>x.classList.remove("active"));f.classList.add("active");renderList();return}const a=e.target.closest("[data-action]");if(!a)return;const id=a.dataset.id;if(a.dataset.action==="toggle")toggle(id);else if(a.dataset.action==="buy")buy(id);else if(a.dataset.action==="delete")del(id);else if(a.dataset.action==="repeat")repeat(Number(a.dataset.index))});
-$("addBtn").addEventListener("click",addItem);$("productInput").addEventListener("keydown",e=>{if(e.key==="Enter")addItem()});$("plannedPriceInput").addEventListener("keydown",e=>{if(e.key==="Enter")addItem()});$("clearDone").addEventListener("click",clearDone);$("backToList").addEventListener("click",()=>{currentTab="list";render()});$("finishShopping").addEventListener("click",finish);$("budgetInput").addEventListener("change",()=>{localStorage.setItem("our-home-budget",String(Number($("budgetInput").value||0)));renderBudget()});
+async function connect(){try{if(!window.supabase){status(false,"Lista local · sincronización no disponible");return}supabaseClient=window.supabase.createClient(SUPABASE_URL,SUPABASE_KEY);const r=await supabaseClient.from("shopping_items").select("*").order("created_at",{ascending:false});if(r.error){console.error(r.error);status(false,"Lista local · revisa la sincronización");return}const remote=(r.data||[]).map(x=>({...x,in_shopping:!!x.in_shopping,last_shopping:!!x.last_shopping}));const ids=new Set(remote.map(x=>x.id));const localOnly=items.filter(x=>!ids.has(x.id));if(localOnly.length){const clean=localOnly.map(x=>({id:x.id,name:x.name,category:x.category||"🛒 General",planned_price:x.planned_price,actual_price:x.actual_price,done:!!x.done,created_at:x.created_at||new Date().toISOString(),quantity:Number(x.quantity)||1,person:x.person||"Alyssa",in_shopping:!!x.in_shopping,last_shopping:!!x.last_shopping}));await supabaseClient.from("shopping_items").insert(clean)}items=[...remote,...localOnly];saveLocal();render();supabaseClient.channel("shopping-live").on("postgres_changes",{event:"*",schema:"public",table:"shopping_items"},p=>{const r0=p.new||p.old;if(!r0||!r0.id)return;const r={...r0,in_shopping:!!r0.in_shopping,last_shopping:!!r0.last_shopping};if(p.eventType==="INSERT"&&!items.some(x=>x.id===r.id))items.unshift(r);if(p.eventType==="UPDATE"){const i=items.findIndex(x=>x.id===r.id);if(i>=0)items[i]=r;else items.unshift(r)}if(p.eventType==="DELETE")items=items.filter(x=>x.id!==r.id);saveLocal();render()}).subscribe(st=>{if(st==="SUBSCRIBED")status(true,"Sincronizado · compartido")})}catch(e){console.error(e);status(false,"Lista local · sincronización no disponible")}}
+document.addEventListener("click",e=>{const t=e.target.closest(".tab");if(t){currentTab=t.dataset.tab;render();return}const f=e.target.closest(".filter");if(f){currentFilter=f.dataset.filter;document.querySelectorAll(".filter").forEach(x=>x.classList.remove("active"));f.classList.add("active");renderList();return}const a=e.target.closest("[data-action]");if(!a)return;const id=a.dataset.id;if(a.dataset.action==="toggle")toggle(id);else if(a.dataset.action==="buy")buy(id);else if(a.dataset.action==="undo")undo(id);else if(a.dataset.action==="addShop")addToShop(id);else if(a.dataset.action==="removeShop")removeFromShop(id);else if(a.dataset.action==="delete")del(id);else if(a.dataset.action==="repeat")repeat(Number(a.dataset.index))});
+$("addBtn").addEventListener("click",addItem);$("productInput").addEventListener("keydown",e=>{if(e.key==="Enter")addItem()});$("plannedPriceInput").addEventListener("keydown",e=>{if(e.key==="Enter")addItem()});$("clearDone").addEventListener("click",clearDone);$("clearHistory").addEventListener("click",clearHistory);$("backToList").addEventListener("click",()=>{currentTab="list";render()});$("finishShopping").addEventListener("click",finish);$("budgetInput").addEventListener("change",()=>{localStorage.setItem("our-home-budget",String(Number($("budgetInput").value||0)));renderBudget()});$("quantityInput").addEventListener("input",()=>$("quantityValue").textContent=$("quantityInput").value);document.addEventListener("input",e=>{if(e.target.matches(".actual-price"))updateUnitTotal(e.target)});
 render();status(false,"Preparando sincronización…");loadSupabase();
 })();
 </script>
