@@ -169,7 +169,7 @@
 .bucket{margin-bottom:10px;background:rgba(255,252,248,.78);border:1px solid var(--line);border-radius:20px;overflow:hidden}
 .bucket-head{padding:12px 14px 8px;background:transparent;border:0}
 .bucket-title{font-size:13px;font-weight:850;letter-spacing:.02em;color:var(--text)}
-.idea-row{display:grid;grid-template-columns:28px minmax(0,1fr) 38px 28px;align-items:center;gap:8px;padding:10px 12px;border-top:1px solid rgba(226,218,208,.72);min-height:48px}
+.idea-row{display:grid;grid-template-columns:minmax(0,1fr) 30px 26px;align-items:center;gap:8px;padding:10px 12px;border-top:1px solid rgba(226,218,208,.72);min-height:48px}
 .idea-main{display:flex;align-items:center;gap:7px;min-width:0}
 .idea-main .product-name{font-size:14px;font-weight:700;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
 .mini-check{width:25px!important;height:25px!important;border-radius:9px!important;font-size:12px!important}
@@ -274,7 +274,7 @@ input,select{padding:10px 11px;border-radius:13px;font-size:13px}
 .bucket{margin-bottom:6px!important;border-radius:14px!important}
 .bucket-head{padding:8px 10px!important}
 .bucket-title{font-size:10px!important;letter-spacing:.06em!important}
-.idea-row{grid-template-columns:28px minmax(0,1fr) 30px 26px!important;gap:5px!important;padding:8px 7px!important;min-height:42px!important}
+.idea-row{grid-template-columns:minmax(0,1fr) 30px 26px!important;gap:5px!important;padding:8px 7px!important;min-height:42px!important}
 .mini-check{width:25px!important;height:25px!important;border-radius:8px!important}
 .idea-main .product-name{font-size:13px!important;font-weight:650!important}
 .idea-main .tag{font-size:8px!important;padding:2px 5px!important}
@@ -461,6 +461,8 @@ function loadLocal(){try{const x=JSON.parse(localStorage.getItem(LOCAL_KEY)||"[]
 function saveLocal(){try{localStorage.setItem(LOCAL_KEY,JSON.stringify(items))}catch(e){}}
 function uid(){return window.crypto&&typeof crypto.randomUUID==="function"?crypto.randomUUID():Date.now().toString(36)+Math.random().toString(36).slice(2)}
 function money(v){return new Intl.NumberFormat("es-ES",{style:"currency",currency:"EUR"}).format(Number(v)||0)}
+function parsePrice(v){if(v==null||v==="")return null;const n=Number(String(v).trim().replace(/\s/g,"").replace(",","."));return Number.isFinite(n)?n:null}
+function formatPriceInput(v){const n=parsePrice(v);return n==null?"":n.toLocaleString("es-ES",{minimumFractionDigits:2,maximumFractionDigits:2})}
 function esc(v){return String(v==null?"":v).replace(/[&<>"']/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;","\"":"&quot;","'":"&#039;"}[c]))}
 function toast(t){$("toast").textContent=t;$("toast").classList.add("show");clearTimeout(window.__toast);window.__toast=setTimeout(()=>$("toast").classList.remove("show"),1500)}
 function status(ok,t){$("connectionDot").classList.toggle("online",!!ok);$("connectionText").textContent=t}
@@ -468,12 +470,12 @@ function render(){renderTabs();renderStats();renderList();renderShop();renderHis
 function renderTabs(){["listView","shopView","historyView"].forEach(id=>$(id).classList.add("hidden"));$(currentTab+"View").classList.remove("hidden");document.body.classList.toggle("shopping-mode",currentTab==="shop");document.querySelectorAll(".tab").forEach(b=>b.classList.toggle("active",b.dataset.tab===currentTab))}
 function renderStats(){const base=visibleIdeas();const pending=base.filter(x=>!x.done).length;const selected=base.filter(x=>!x.done&&x.in_shopping).length;$("statusText").textContent=base.length?(pending+" "+(pending===1?"cosa pendiente":"cosas pendientes")):"Añade lo que tengáis pendiente en casa";}
 function renderBudget(){}
-function visibleIdeas(){return items.filter(x=>!x.quick_buy)}
+function visibleIdeas(){return items.filter(x=>!x.quick_buy&&!x.done)}
 function filtered(){const base=visibleIdeas();return currentFilter==="pending"?base.filter(x=>!x.done):currentFilter==="done"?base.filter(x=>x.done):base}
 function categoryKey(cat){return String(cat||"🛒 General").trim()}
 const bucketOrder=["🍳 Cocina","🛁 Baño","🛋️ Salón","🛏️ Dormitorio","🧽 Limpieza","🥑 Alimentación","🐾 Mascotas","🪑 Muebles","🕯️ Decoración","🛒 General"];
 function categoryGroups(arr){const groups={};arr.forEach(x=>{const k=categoryKey(x.category);(groups[k]||(groups[k]=[])).push(x)});return bucketOrder.filter(k=>groups[k]).map(k=>[k,groups[k]]).concat(Object.keys(groups).filter(k=>!bucketOrder.includes(k)).map(k=>[k,groups[k]]))}
-function ideaRow(x){const q=Number(x.quantity)||1;const action=!x.done?(x.in_shopping?'<button class="shop-icon selected" aria-label="Quitar de compra" data-action="removeShop" data-id="'+esc(x.id)+'" type="button">✓</button>':'<button class="shop-icon" aria-label="Añadir a compra" data-action="addShop" data-id="'+esc(x.id)+'" type="button">🛒</button>'):'';return '<div class="idea-row '+(x.done?"done":"")+'"><button class="check mini-check" data-action="toggle" data-id="'+esc(x.id)+'" type="button">'+(x.done?"✓":"")+'</button><div class="idea-main"><span class="product-name">'+esc(x.name)+'</span><span class="tag">×'+q+'</span></div>'+action+'<button class="delete mini-delete" data-action="delete" data-id="'+esc(x.id)+'" type="button">×</button></div>'}
+function ideaRow(x){const q=Number(x.quantity)||1;const action=x.in_shopping?'<button class="shop-icon selected" aria-label="Quitar de compra" data-action="removeShop" data-id="'+esc(x.id)+'" type="button">✓</button>':'<button class="shop-icon" aria-label="Añadir a compra" data-action="addShop" data-id="'+esc(x.id)+'" type="button">🛒</button>';return '<div class="idea-row"><div class="idea-main"><span class="product-name">'+esc(x.name)+'</span><span class="tag">×'+q+'</span></div>'+action+'<button class="delete mini-delete" data-action="delete" data-id="'+esc(x.id)+'" type="button">×</button></div>'}
 function renderList(){const a=filtered();const groups=categoryGroups(a);if(!groups.length){$("list").innerHTML='<div class="empty"><span class="emoji">🏡</span><strong>No hay nada pendiente</strong><span>Añade lo que falte en casa.</span></div>';return}$("list").innerHTML=groups.map(([cat,arr])=>'<section class="bucket"><div class="bucket-head"><span class="bucket-title">'+esc(cat)+'</span></div>'+arr.map(ideaRow).join('')+'</section>').join('')}
 function pickerRow(x){const q=Number(x.quantity)||1;return '<div class="picker-item"><div><div class="picker-name">'+esc(x.name)+' · ×'+q+'</div><div class="picker-meta">'+esc(x.category||"🛒 General")+'</div></div><button class="picker-btn '+(x.in_shopping?"selected":"")+'" data-action="'+(x.in_shopping?"removeShop":"addShop")+'" data-id="'+esc(x.id)+'" type="button">'+(x.in_shopping?"✓ Añadido":"＋ Añadir")+'</button></div>'}
 function renderPicker(){}
@@ -498,7 +500,7 @@ function shopItemRow(x){
   return '<div class="shop-row">'
     +'<button class="check shop-check" data-action="buy" data-id="'+esc(x.id)+'" type="button" aria-label="Marcar comprado">✓</button>'
     +'<div class="shop-main"><div class="shop-product"><span class="product-name">'+esc(x.name)+'</span><span class="tag">×'+q+'</span></div></div>'
-    +'<input class="actual-price shop-price" data-price-id="'+esc(x.id)+'" data-qty="'+q+'" type="number" min="0" step="0.01" inputmode="decimal" placeholder="€/ud." value="'+(actualUnit!=null?esc(actualUnit):"")+'">'
+    +'<input class="actual-price shop-price" data-price-id="'+esc(x.id)+'" data-qty="'+q+'" type="text" inputmode="decimal" autocomplete="off" placeholder="€/ud." value="'+(actualUnit!=null?esc(String(actualUnit).replace(".",",")):"")+'">'
     +'<button class="shop-remove" data-action="removeShop" data-id="'+esc(x.id)+'" type="button" aria-label="Quitar de la compra">×</button>'
   +'</div>';
 }
@@ -530,7 +532,7 @@ async function quickAdd(){const name=$("quickBuyName").value.trim();if(!name){$(
 async function syncInsert(x){if(!supabaseClient)return;const {error}=await supabaseClient.from("shopping_items").insert(x);if(error){console.error(error);status(false,"Lista local · pendiente de sincronización")}}
 async function remoteUpdate(id,p){if(!supabaseClient)return;const {error}=await supabaseClient.from("shopping_items").update(p).eq("id",id);if(error)console.error(error)}
 async function toggle(id){const x=items.find(a=>a.id===id);if(!x)return;x.done=!x.done;saveLocal();render();await remoteUpdate(id,{done:x.done})}
-async function buy(id){const el=document.querySelector('[data-price-id="'+CSS.escape(id)+'"]');const x=items.find(a=>a.id===id);if(!x)return;const value=el&&el.value!==""?Number(el.value):(x.actual_price!=null?Number(x.actual_price):null);x.done=true;x.actual_price=value;x.in_shopping=false;x.last_shopping=true;saveLocal();render();await remoteUpdate(id,{done:true,actual_price:value,in_shopping:false,last_shopping:true});toast(value!=null?"Añadido al total ♡":"Marcado como comprado")}
+async function buy(id){const el=document.querySelector('[data-price-id="'+CSS.escape(id)+'"]');const x=items.find(a=>a.id===id);if(!x)return;const value=el&&el.value!==""?parsePrice(el.value):(x.actual_price!=null?parsePrice(x.actual_price):null);x.done=true;x.actual_price=value;x.in_shopping=false;x.last_shopping=true;saveLocal();render();await remoteUpdate(id,{done:true,actual_price:value,in_shopping:false,last_shopping:true});toast(value!=null?"Añadido al total ♡":"Marcado como comprado")}
 async function undo(id){const x=items.find(a=>a.id===id);if(!x)return;x.done=false;x.actual_price=null;x.in_shopping=true;x.last_shopping=true;saveLocal();render();await remoteUpdate(id,{done:false,actual_price:null,in_shopping:true,last_shopping:true});toast("Compra deshecha ♡")}
 function clearHistory(){if(!hist().length)return;if(!confirm("¿Borrar todo el historial de compras?"))return;localStorage.removeItem("our-home-history");renderHistory();toast("Historial borrado")}
 function deleteHistory(i){const h=hist();if(!h[i])return;if(!confirm("¿Borrar la compra del "+h[i].date+" del historial?"))return;h.splice(i,1);localStorage.setItem("our-home-history",JSON.stringify(h));renderHistory();toast("Compra eliminada del historial")}
@@ -538,15 +540,24 @@ let priceSyncTimers={};
 function updateUnitTotal(input){
   const id=input.dataset.priceId;
   const q=Number(input.dataset.qty)||1;
-  const value=input.value===""?null:Number(input.value);
+  const value=parsePrice(input.value);
   const x=items.find(a=>a.id===id);
   if(x)x.actual_price=value;
   saveLocal();
-  const out=document.querySelector('[data-total-id="'+CSS.escape(id)+'"]');
-  if(out)out.textContent=value==null?"Total: —":"Total: "+money(value*q);
   updateShopTotals();
   clearTimeout(priceSyncTimers[id]);
   priceSyncTimers[id]=setTimeout(()=>{if(x&&supabaseClient)remoteUpdate(id,{actual_price:value})},350);
+}
+function normalizePriceInput(input){
+  const raw=input.value.replace(/[^0-9,\.]/g,"");
+  const parts=raw.replace(/\./g,",").split(",");
+  input.value=parts.length>1?parts[0]+","+parts.slice(1).join("").slice(0,2):raw;
+  updateUnitTotal(input);
+}
+function formatPriceOnBlur(input){
+  const n=parsePrice(input.value);
+  input.value=n==null?"":n.toLocaleString("es-ES",{minimumFractionDigits:2,maximumFractionDigits:2});
+  updateUnitTotal(input);
 }
 
 async function del(id){items=items.filter(x=>x.id!==id);saveLocal();render();if(supabaseClient)await supabaseClient.from("shopping_items").delete().eq("id",id);toast("Eliminado")}
@@ -556,7 +567,7 @@ function repeat(i){const h=hist()[i];if(!h)return;const now=new Date().toISOStri
 function loadSupabase(){const s=document.createElement("script");s.src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2";s.async=true;s.onload=connect;s.onerror=()=>status(false,"Lista local · sincronización no disponible");document.head.appendChild(s)}
 async function connect(){try{if(!window.supabase){status(false,"Lista local · sincronización no disponible");return}supabaseClient=window.supabase.createClient(SUPABASE_URL,SUPABASE_KEY);const r=await supabaseClient.from("shopping_items").select("*").order("created_at",{ascending:false});if(r.error){console.error(r.error);status(false,"Lista local · revisa la sincronización");return}const remote=(r.data||[]).map(x=>({...x,in_shopping:!!x.in_shopping,last_shopping:!!x.last_shopping,quick_buy:!!x.quick_buy}));const ids=new Set(remote.map(x=>x.id));const localOnly=items.filter(x=>!ids.has(x.id));if(localOnly.length){const clean=localOnly.map(x=>({id:x.id,name:x.name,category:x.category||"🛒 General",planned_price:x.planned_price,actual_price:x.actual_price,done:!!x.done,created_at:x.created_at||new Date().toISOString(),quantity:Number(x.quantity)||1,in_shopping:!!x.in_shopping,last_shopping:!!x.last_shopping,quick_buy:!!x.quick_buy}));await supabaseClient.from("shopping_items").insert(clean)}items=[...remote,...localOnly];saveLocal();render();supabaseClient.channel("shopping-live").on("postgres_changes",{event:"*",schema:"public",table:"shopping_items"},p=>{const r0=p.new||p.old;if(!r0||!r0.id)return;const r={...r0,in_shopping:!!r0.in_shopping,last_shopping:!!r0.last_shopping};if(p.eventType==="INSERT"&&!items.some(x=>x.id===r.id))items.unshift(r);if(p.eventType==="UPDATE"){const i=items.findIndex(x=>x.id===r.id);if(i>=0)items[i]=r;else items.unshift(r)}if(p.eventType==="DELETE")items=items.filter(x=>x.id!==r.id);saveLocal();render()}).subscribe(st=>{if(st==="SUBSCRIBED")status(true,"Sincronizado · compartido")})}catch(e){console.error(e);status(false,"Lista local · sincronización no disponible")}}
 document.addEventListener("click",e=>{const t=e.target.closest(".tab");if(t){currentTab=t.dataset.tab;render();return}const f=e.target.closest(".filter");if(f){currentFilter=f.dataset.filter;document.querySelectorAll(".filter").forEach(x=>x.classList.remove("active"));f.classList.add("active");renderList();return}const a=e.target.closest("[data-action]");if(!a)return;const id=a.dataset.id;if(a.dataset.action==="toggle")toggle(id);else if(a.dataset.action==="buy")buy(id);else if(a.dataset.action==="undo")undo(id);else if(a.dataset.action==="addShop")addToShop(id);else if(a.dataset.action==="removeShop")removeFromShop(id);else if(a.dataset.action==="delete")del(id);else if(a.dataset.action==="repeat")repeat(Number(a.dataset.index));else if(a.dataset.action==="deleteHistory")deleteHistory(Number(a.dataset.index))});
-$("quickBuyBtn").addEventListener("click",quickAdd);$("quickBuyName").addEventListener("keydown",e=>{if(e.key==="Enter")quickAdd()});$("addBtn").addEventListener("click",addItem);$("productInput").addEventListener("keydown",e=>{if(e.key==="Enter")addItem()});$("clearDone").addEventListener("click",clearDone);$("clearHistory").addEventListener("click",clearHistory);$("backToList").addEventListener("click",()=>{currentTab="list";render()});$("finishShopping").addEventListener("click",finish);document.addEventListener("input",e=>{if(e.target.matches(".actual-price"))updateUnitTotal(e.target)});
+$("quickBuyBtn").addEventListener("click",quickAdd);$("quickBuyName").addEventListener("keydown",e=>{if(e.key==="Enter")quickAdd()});$("addBtn").addEventListener("click",addItem);$("productInput").addEventListener("keydown",e=>{if(e.key==="Enter")addItem()});$("clearDone").addEventListener("click",clearDone);$("clearHistory").addEventListener("click",clearHistory);$("backToList").addEventListener("click",()=>{currentTab="list";render()});$("finishShopping").addEventListener("click",finish);document.addEventListener("input",e=>{if(e.target.matches(".actual-price"))normalizePriceInput(e.target)});document.addEventListener("blur",e=>{if(e.target.matches(".actual-price"))formatPriceOnBlur(e.target)},true);
 render();status(false,"Preparando sincronización…");loadSupabase();
 })();
 </script>
