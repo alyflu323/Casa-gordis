@@ -248,6 +248,84 @@ body.shopping-mode .undo-btn{padding:5px 7px!important;font-size:9px!important}
   body.shopping-mode .shop-product .product-name{font-size:12.5px!important}
 }
 
+
+/* COMPACT CLEAN UI */
+:root{--radius:18px}
+.app{padding:18px 14px 30px;max-width:680px}
+header{padding:4px 2px 13px}
+.eyebrow{font-size:11px;margin-bottom:4px}
+h1{font-size:clamp(31px,8.5vw,44px)}
+.subtitle{font-size:12px;margin-top:7px;line-height:1.25}
+.home-icon{width:44px;height:44px;border-radius:15px;font-size:21px}
+.connection{font-size:10px;margin:0 2px 9px}
+.tabs{margin-bottom:10px;border-radius:15px;padding:3px}
+.tab{padding:9px 6px;font-size:12px;border-radius:12px}
+.card{border-radius:18px}
+.add-card{padding:11px;margin-bottom:10px}
+.add-row{gap:7px}
+input,select{padding:10px 11px;border-radius:13px;font-size:13px}
+.add-btn{min-width:46px;border-radius:13px;font-size:21px}
+.idea-details{grid-template-columns:1fr 118px;gap:7px;margin-top:7px}
+.quantity-box{padding:7px 9px;border-radius:13px;gap:7px}
+.quantity-box label{font-size:9px}
+.quantity-select{width:55px!important;padding:7px 20px 7px 7px!important;font-size:13px!important}
+.hint{display:none}
+.list-card{padding:3px}
+.bucket{margin-bottom:6px!important;border-radius:14px!important}
+.bucket-head{padding:8px 10px!important}
+.bucket-title{font-size:10px!important;letter-spacing:.06em!important}
+.idea-row{grid-template-columns:28px minmax(0,1fr) 30px 26px!important;gap:5px!important;padding:8px 7px!important;min-height:42px!important}
+.mini-check{width:25px!important;height:25px!important;border-radius:8px!important}
+.idea-main .product-name{font-size:13px!important;font-weight:650!important}
+.idea-main .tag{font-size:8px!important;padding:2px 5px!important}
+.shop-icon{width:28px!important;height:28px!important;font-size:13px!important}
+.mini-delete{width:24px!important;height:24px!important;font-size:14px!important}
+.empty{padding:22px 14px!important}
+.empty .emoji{font-size:27px!important;margin-bottom:6px!important}
+.empty strong{font-size:14px!important}
+.empty span{font-size:11px!important}
+.bottom{padding:7px 5px 1px;font-size:9px}
+.clear{font-size:9px}
+
+body.shopping-mode .app{padding:12px 10px 24px}
+body.shopping-mode header{display:none}
+body.shopping-mode .connection{display:none}
+body.shopping-mode .tabs{margin-bottom:8px}
+body.shopping-mode .checkout{margin-bottom:8px!important;padding:12px!important;border-radius:17px!important}
+body.shopping-mode .checkout-title{margin-bottom:8px!important}
+body.shopping-mode .checkout-title h2{font-size:19px!important}
+body.shopping-mode .checkout-note{font-size:10px!important}
+body.shopping-mode .big-total{font-size:24px!important}
+body.shopping-mode .progress{height:6px!important;margin:7px 0 5px!important}
+body.shopping-mode .buy-actions{margin-top:9px!important}
+body.shopping-mode .secondary,.shopping-mode .primary{padding:9px!important;font-size:11px!important}
+body.shopping-mode .compact-quick{padding:10px!important;margin-bottom:8px!important}
+body.shopping-mode .quick-head h3{font-size:17px!important;margin:0!important}
+body.shopping-mode .quick-head p{font-size:10px!important;margin:3px 0 7px!important}
+body.shopping-mode .compact-grid{grid-template-columns:minmax(0,1fr) 82px!important;gap:6px!important}
+body.shopping-mode .compact-grid input{font-size:12px!important}
+body.shopping-mode .compact-grid .add-btn{min-width:0!important;font-size:11px!important}
+body.shopping-mode .shop-group{margin:0 0 6px!important;border-radius:14px!important}
+body.shopping-mode .shop-group-title{padding:7px 10px!important;font-size:9px!important}
+body.shopping-mode .shop-row{grid-template-columns:28px minmax(0,1fr) 70px 18px!important;gap:5px!important;min-height:40px!important;height:40px!important;padding:5px 7px!important}
+body.shopping-mode .shop-check{width:26px!important;height:26px!important;border-radius:8px!important;font-size:12px!important}
+body.shopping-mode .shop-product .product-name{font-size:12px!important;font-weight:650!important}
+body.shopping-mode .shop-product .tag{font-size:8px!important;padding:2px 5px!important}
+body.shopping-mode .shop-price{width:70px!important;min-width:70px!important;max-width:70px!important;height:30px!important;font-size:11px!important;padding:5px!important;border-radius:9px!important}
+body.shopping-mode .shop-remove{width:18px!important;height:24px!important;font-size:13px!important}
+body.shopping-mode .bought-section{margin-top:6px!important;padding:8px!important}
+body.shopping-mode .bought-title{font-size:8px!important}
+body.shopping-mode .undo-row{padding:5px 0!important;font-size:9px!important}
+body.shopping-mode .undo-btn{font-size:9px!important;padding:4px 6px!important}
+
+#historyView>.card:first-child{padding:11px!important;margin-bottom:9px!important}
+#historyView h2{font-size:19px!important}
+#historyView p{font-size:10px!important}
+.history-actions{margin-top:5px!important}
+.history-delete,.clear-history{font-size:9px!important}
+#historyList .secondary{font-size:10px!important;padding:8px!important}
+#historyList>div{padding:9px 7px!important}
+
 </style>
 </head>
 
@@ -276,7 +354,8 @@ body.shopping-mode .undo-btn{padding:5px 7px!important;font-size:9px!important}
         <input id="productInput" type="text" placeholder="¿Qué queremos tener pendiente? ✨" autocomplete="off">
         <button class="add-btn" id="addBtn">+</button>
       </div>
-      <div class="details-row">
+
+      <div class="details-row idea-details">
         <select id="categoryInput">
           <option value="🍳 Cocina">🍳 Cocina</option>
           <option value="🛁 Baño">🛁 Baño</option>
@@ -289,20 +368,13 @@ body.shopping-mode .undo-btn{padding:5px 7px!important;font-size:9px!important}
           <option value="🕯️ Decoración">🕯️ Decoración</option>
           <option value="🛒 General">🛒 General</option>
         </select>
-      </div>
-      <div class="details-row">
         <div class="quantity-box">
           <label for="quantityInput">Cantidad</label>
           <select id="quantityInput" class="quantity-select">
             <option value="1">1</option><option value="2">2</option><option value="3">3</option><option value="4">4</option><option value="5">5</option><option value="6">6</option><option value="7">7</option><option value="8">8</option><option value="9">9</option><option value="10">10</option>
           </select>
         </div>
-        <select id="personInput">
-          <option value="Alyssa">👩 Alyssa</option>
-          <option value="Pol">👨 Pol</option>
-        </select>
       </div>
-      <p class="hint">💡 Aquí solo apuntáis lo que necesitáis. El precio se añade después, cuando estéis comprando.</p>
     </section>
 
     <section class="card list-card">
@@ -341,9 +413,7 @@ body.shopping-mode .undo-btn{padding:5px 7px!important;font-size:9px!important}
         <input id="quickBuyName" type="text" placeholder="Producto" autocomplete="off">
         <button class="add-btn" id="quickBuyBtn" type="button">Añadir</button>
       </div>
-      <div class="quick-buy-meta compact-meta">
-        <div class="quantity-box"><label for="quickBuyQuantity">Cantidad</label><select id="quickBuyQuantity" class="quantity-select"><option value="1">1</option><option value="2">2</option><option value="3">3</option><option value="4">4</option><option value="5">5</option><option value="6">6</option><option value="7">7</option><option value="8">8</option><option value="9">9</option><option value="10">10</option></select></div>
-      </div>
+
     </section>
 
     <section class="card list-card">
@@ -371,7 +441,7 @@ body.shopping-mode .undo-btn{padding:5px 7px!important;font-size:9px!important}
 
   <section id="setupMessage" class="card setup hidden">
     <h2>💗 Falta conectar la sincronización</h2>
-    <p>La sincronización está configurada para que Alyssa y Pol podáis ver la misma lista desde móviles distintos.</p>
+    <p>La sincronización está configurada para que la lista se vea igual en todos los móviles.</p>
     <p>Cualquier producto que añada uno aparecerá automáticamente en el móvil del otro.</p>
   </section>
 </main>
@@ -453,10 +523,10 @@ function renderShop(){
 
 function hist(){try{const x=JSON.parse(localStorage.getItem("our-home-history")||"[]");return Array.isArray(x)?x:[]}catch(e){return[]}}
 function renderHistory(){const h=hist();$("historyList").innerHTML=h.length?h.map((x,i)=>'<div style="padding:13px 10px;border-bottom:1px solid var(--line)"><div style="display:flex;justify-content:space-between;gap:10px"><div><strong style="font-size:13px">'+esc(x.date)+'</strong><div style="font-size:10px;color:var(--muted);margin-top:3px">'+x.count+' unidades</div></div><strong style="color:var(--terra-dark)">'+money(x.total)+'</strong></div><div style="display:flex;gap:12px;align-items:center;margin-top:8px"><button class="secondary" style="flex:1" data-action="repeat" data-index="'+i+'" type="button">↻ Añadir otra vez</button><button class="history-delete" data-action="deleteHistory" data-index="'+i+'" type="button">🗑 Borrar esta compra</button></div></div>').join(''):'<div class="empty"><span class="emoji">🧾</span><strong>Aún no hay compras anteriores</strong><span>Cuando terminéis una compra aparecerá aquí.</span></div>'}
-function addItem(){const name=$("productInput").value.trim();if(!name){$("productInput").focus();return}const q=Math.max(1,parseInt($("quantityInput").value||"1",10)||1);const x={id:uid(),name,category:$("categoryInput").value,planned_price:null,actual_price:null,quantity:q,person:$("personInput").value,done:false,in_shopping:false,last_shopping:false,created_at:new Date().toISOString()};items.unshift(x);saveLocal();render();$("productInput").value="";$("quantityInput").value="1";$("productInput").focus();toast("Añadido a la lista ♡");syncInsert(x)}
+function addItem(){const name=$("productInput").value.trim();if(!name){$("productInput").focus();return}const q=Math.max(1,parseInt($("quantityInput").value||"1",10)||1);const x={id:uid(),name,category:$("categoryInput").value,planned_price:null,actual_price:null,quantity:q,done:false,in_shopping:false,last_shopping:false,created_at:new Date().toISOString()};items.unshift(x);saveLocal();render();$("productInput").value="";$("quantityInput").value="1";$("productInput").focus();toast("Añadido a la lista ♡");syncInsert(x)}
 async function addToShop(id){const x=items.find(a=>a.id===id);if(!x)return;x.in_shopping=true;x.last_shopping=true;saveLocal();render();await remoteUpdate(id,{in_shopping:true,last_shopping:true});toast("Añadido a la compra 🛒")}
 async function removeFromShop(id){const x=items.find(a=>a.id===id);if(!x)return;x.in_shopping=false;saveLocal();render();await remoteUpdate(id,{in_shopping:false});toast("Quitado de la compra")}
-async function quickAdd(){const name=$("quickBuyName").value.trim();if(!name){$("quickBuyName").focus();return}const q=Math.max(1,parseInt($("quickBuyQuantity").value||"1",10)||1);const x={id:uid(),name,category:"🛒 Compra directa",planned_price:null,actual_price:null,quantity:q,person:"Alyssa",done:false,in_shopping:true,last_shopping:true,quick_buy:true,created_at:new Date().toISOString()};items.unshift(x);saveLocal();render();$("quickBuyName").value="";$("quickBuyQuantity").value="1";$("quickBuyName").focus();toast("Añadido a la compra 🛒");syncInsert(x)}
+async function quickAdd(){const name=$("quickBuyName").value.trim();if(!name){$("quickBuyName").focus();return}const q=1;const x={id:uid(),name,category:"🛒 Compra directa",planned_price:null,actual_price:null,quantity:q,done:false,in_shopping:true,last_shopping:true,quick_buy:true,created_at:new Date().toISOString()};items.unshift(x);saveLocal();render();$("quickBuyName").value="";$("quickBuyName").focus();toast("Añadido a la compra 🛒");syncInsert(x)}
 async function syncInsert(x){if(!supabaseClient)return;const {error}=await supabaseClient.from("shopping_items").insert(x);if(error){console.error(error);status(false,"Lista local · pendiente de sincronización")}}
 async function remoteUpdate(id,p){if(!supabaseClient)return;const {error}=await supabaseClient.from("shopping_items").update(p).eq("id",id);if(error)console.error(error)}
 async function toggle(id){const x=items.find(a=>a.id===id);if(!x)return;x.done=!x.done;saveLocal();render();await remoteUpdate(id,{done:x.done})}
@@ -484,7 +554,7 @@ async function clearDone(){const ids=items.filter(x=>x.done).map(x=>x.id);if(!id
 async function finish(){const b=items.filter(x=>x.done&&x.last_shopping);if(!b.length){toast("Aún no hay productos comprados en esta compra");return}const total=b.reduce((s,x)=>s+(Number(x.actual_price)||0)*(Number(x.quantity)||1),0);const h=hist();h.unshift({date:new Intl.DateTimeFormat("es-ES",{dateStyle:"medium"}).format(new Date()),count:b.reduce((s,x)=>s+(Number(x.quantity)||1),0),total,items:b.map(x=>({...x}))});localStorage.setItem("our-home-history",JSON.stringify(h.slice(0,20)));for(const x of b){x.last_shopping=false;x.in_shopping=false;await remoteUpdate(x.id,{last_shopping:false,in_shopping:false})}saveLocal();currentTab="history";render();toast("Compra guardada en el historial ♡")}
 function repeat(i){const h=hist()[i];if(!h)return;const now=new Date().toISOString();const c=h.items.map(x=>({...x,id:uid(),done:false,actual_price:null,in_shopping:false,last_shopping:false,created_at:now}));items=[...c,...items];saveLocal();render();c.forEach(syncInsert);toast("Productos añadidos ♡")}
 function loadSupabase(){const s=document.createElement("script");s.src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2";s.async=true;s.onload=connect;s.onerror=()=>status(false,"Lista local · sincronización no disponible");document.head.appendChild(s)}
-async function connect(){try{if(!window.supabase){status(false,"Lista local · sincronización no disponible");return}supabaseClient=window.supabase.createClient(SUPABASE_URL,SUPABASE_KEY);const r=await supabaseClient.from("shopping_items").select("*").order("created_at",{ascending:false});if(r.error){console.error(r.error);status(false,"Lista local · revisa la sincronización");return}const remote=(r.data||[]).map(x=>({...x,in_shopping:!!x.in_shopping,last_shopping:!!x.last_shopping,quick_buy:!!x.quick_buy}));const ids=new Set(remote.map(x=>x.id));const localOnly=items.filter(x=>!ids.has(x.id));if(localOnly.length){const clean=localOnly.map(x=>({id:x.id,name:x.name,category:x.category||"🛒 General",planned_price:x.planned_price,actual_price:x.actual_price,done:!!x.done,created_at:x.created_at||new Date().toISOString(),quantity:Number(x.quantity)||1,person:x.person||"Alyssa",in_shopping:!!x.in_shopping,last_shopping:!!x.last_shopping,quick_buy:!!x.quick_buy}));await supabaseClient.from("shopping_items").insert(clean)}items=[...remote,...localOnly];saveLocal();render();supabaseClient.channel("shopping-live").on("postgres_changes",{event:"*",schema:"public",table:"shopping_items"},p=>{const r0=p.new||p.old;if(!r0||!r0.id)return;const r={...r0,in_shopping:!!r0.in_shopping,last_shopping:!!r0.last_shopping};if(p.eventType==="INSERT"&&!items.some(x=>x.id===r.id))items.unshift(r);if(p.eventType==="UPDATE"){const i=items.findIndex(x=>x.id===r.id);if(i>=0)items[i]=r;else items.unshift(r)}if(p.eventType==="DELETE")items=items.filter(x=>x.id!==r.id);saveLocal();render()}).subscribe(st=>{if(st==="SUBSCRIBED")status(true,"Sincronizado · compartido")})}catch(e){console.error(e);status(false,"Lista local · sincronización no disponible")}}
+async function connect(){try{if(!window.supabase){status(false,"Lista local · sincronización no disponible");return}supabaseClient=window.supabase.createClient(SUPABASE_URL,SUPABASE_KEY);const r=await supabaseClient.from("shopping_items").select("*").order("created_at",{ascending:false});if(r.error){console.error(r.error);status(false,"Lista local · revisa la sincronización");return}const remote=(r.data||[]).map(x=>({...x,in_shopping:!!x.in_shopping,last_shopping:!!x.last_shopping,quick_buy:!!x.quick_buy}));const ids=new Set(remote.map(x=>x.id));const localOnly=items.filter(x=>!ids.has(x.id));if(localOnly.length){const clean=localOnly.map(x=>({id:x.id,name:x.name,category:x.category||"🛒 General",planned_price:x.planned_price,actual_price:x.actual_price,done:!!x.done,created_at:x.created_at||new Date().toISOString(),quantity:Number(x.quantity)||1,in_shopping:!!x.in_shopping,last_shopping:!!x.last_shopping,quick_buy:!!x.quick_buy}));await supabaseClient.from("shopping_items").insert(clean)}items=[...remote,...localOnly];saveLocal();render();supabaseClient.channel("shopping-live").on("postgres_changes",{event:"*",schema:"public",table:"shopping_items"},p=>{const r0=p.new||p.old;if(!r0||!r0.id)return;const r={...r0,in_shopping:!!r0.in_shopping,last_shopping:!!r0.last_shopping};if(p.eventType==="INSERT"&&!items.some(x=>x.id===r.id))items.unshift(r);if(p.eventType==="UPDATE"){const i=items.findIndex(x=>x.id===r.id);if(i>=0)items[i]=r;else items.unshift(r)}if(p.eventType==="DELETE")items=items.filter(x=>x.id!==r.id);saveLocal();render()}).subscribe(st=>{if(st==="SUBSCRIBED")status(true,"Sincronizado · compartido")})}catch(e){console.error(e);status(false,"Lista local · sincronización no disponible")}}
 document.addEventListener("click",e=>{const t=e.target.closest(".tab");if(t){currentTab=t.dataset.tab;render();return}const f=e.target.closest(".filter");if(f){currentFilter=f.dataset.filter;document.querySelectorAll(".filter").forEach(x=>x.classList.remove("active"));f.classList.add("active");renderList();return}const a=e.target.closest("[data-action]");if(!a)return;const id=a.dataset.id;if(a.dataset.action==="toggle")toggle(id);else if(a.dataset.action==="buy")buy(id);else if(a.dataset.action==="undo")undo(id);else if(a.dataset.action==="addShop")addToShop(id);else if(a.dataset.action==="removeShop")removeFromShop(id);else if(a.dataset.action==="delete")del(id);else if(a.dataset.action==="repeat")repeat(Number(a.dataset.index));else if(a.dataset.action==="deleteHistory")deleteHistory(Number(a.dataset.index))});
 $("quickBuyBtn").addEventListener("click",quickAdd);$("quickBuyName").addEventListener("keydown",e=>{if(e.key==="Enter")quickAdd()});$("addBtn").addEventListener("click",addItem);$("productInput").addEventListener("keydown",e=>{if(e.key==="Enter")addItem()});$("clearDone").addEventListener("click",clearDone);$("clearHistory").addEventListener("click",clearHistory);$("backToList").addEventListener("click",()=>{currentTab="list";render()});$("finishShopping").addEventListener("click",finish);document.addEventListener("input",e=>{if(e.target.matches(".actual-price"))updateUnitTotal(e.target)});
 render();status(false,"Preparando sincronización…");loadSupabase();
