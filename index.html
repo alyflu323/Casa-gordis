@@ -182,8 +182,8 @@
 
   <section id="setupMessage" class="card setup hidden">
     <h2>💗 Falta conectar la sincronización</h2>
-    <p>La app funciona, pero para que Alyssa y Paul veáis exactamente la misma lista desde móviles distintos hay que conectar una base de datos de Supabase.</p>
-    <p>Cuando la conectemos, cualquier producto que añada uno aparecerá automáticamente en el móvil del otro.</p>
+    <p>La sincronización está configurada para que Alyssa y Pol podáis ver la misma lista desde móviles distintos.</p>
+    <p>Cualquier producto que añada uno aparecerá automáticamente en el móvil del otro.</p>
   </section>
 </main>
 
@@ -200,8 +200,8 @@
    *
    * NO pongas nunca aquí una service_role key.
    */
-  const SUPABASE_URL = "PON_AQUI_TU_SUPABASE_URL";
-  const SUPABASE_ANON_KEY = "PON_AQUI_TU_SUPABASE_ANON_KEY";
+  const SUPABASE_URL = "https://esjkabcbxnrcklcwncap.supabase.co";
+  const SUPABASE_ANON_KEY = "sb_publishable_hFUuotzrcj574thQhQQedA_bbjmomnV";
 
   const supabaseReady =
     SUPABASE_URL.startsWith("https://") &&
@@ -481,6 +481,7 @@
   $("finishShopping").addEventListener("click",finishShopping);
 
   render();
+  if (!supabaseReady) $("setupMessage").classList.remove("hidden");
   loadRemote();
   subscribeRealtime();
 </script>
