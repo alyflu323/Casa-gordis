@@ -1,0 +1,488 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="theme-color" content="#f8f1eb">
+  <title>Nuestro Hogar 🏡</title>
+
+  <!-- Supabase: necesario para sincronizar entre móviles -->
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+
+  <style>
+    :root {
+      --bg:#f8f1eb; --card:#fffaf6; --card2:#f5e8e0;
+      --text:#403532; --muted:#8f7d76; --terra:#c97f69;
+      --terra-dark:#a96350; --rose:#dfb5aa; --sage:#aab9a0;
+      --line:#eadbd2; --white:#fffdfb;
+      --shadow:0 12px 35px rgba(107,75,62,.09); --radius:22px;
+    }
+    *{box-sizing:border-box}
+    body{
+      margin:0; min-height:100vh; color:var(--text);
+      font-family:-apple-system,BlinkMacSystemFont,"SF Pro Display","Segoe UI",sans-serif;
+      background:
+        radial-gradient(circle at 90% 0%,rgba(223,181,170,.22),transparent 30%),
+        radial-gradient(circle at 0% 35%,rgba(170,185,160,.14),transparent 28%),var(--bg);
+    }
+    button,input,select{font:inherit}
+    button{cursor:pointer}
+    .app{width:min(100%,720px);margin:auto;padding:25px 18px 45px}
+    header{padding:7px 4px 20px;display:flex;justify-content:space-between;gap:15px}
+    .eyebrow{margin:0 0 5px;color:var(--terra-dark);font-size:12px;font-weight:700;letter-spacing:.13em;text-transform:uppercase}
+    h1{margin:0;font-family:Georgia,serif;font-size:clamp(34px,10vw,50px);line-height:.95;font-weight:500;letter-spacing:-.04em}
+    .subtitle{margin:10px 0 0;color:var(--muted);font-size:14px}
+    .home-icon{width:48px;height:48px;border-radius:17px;background:var(--card);box-shadow:var(--shadow);display:grid;place-items:center;font-size:23px;flex:none}
+    .connection{font-size:11px;color:var(--muted);margin:0 3px 13px}
+    .connection span{display:inline-flex;align-items:center;gap:5px}
+    .dot{width:7px;height:7px;border-radius:50%;background:#d6a39a}
+    .dot.online{background:#9caf91}
+
+    .tabs{display:grid;grid-template-columns:1fr 1fr;background:rgba(234,219,210,.55);padding:4px;border-radius:17px;margin-bottom:14px}
+    .tab{border:0;background:transparent;color:var(--muted);padding:11px;border-radius:13px;font-size:13px;font-weight:700}
+    .tab.active{background:var(--card);color:var(--text);box-shadow:0 5px 15px rgba(107,75,62,.07)}
+
+    .summary{display:grid;grid-template-columns:repeat(3,1fr);gap:9px;margin-bottom:14px}
+    .stat{background:rgba(255,250,246,.88);border:1px solid rgba(234,219,210,.7);border-radius:18px;padding:13px 9px;text-align:center}
+    .stat-number{display:block;font-size:20px;font-weight:750}.stat-label{display:block;margin-top:3px;color:var(--muted);font-size:10px}
+
+    .card{background:rgba(255,250,246,.93);border:1px solid var(--line);border-radius:var(--radius);box-shadow:var(--shadow)}
+    .add-card{padding:15px;margin-bottom:14px}
+    .add-row{display:grid;grid-template-columns:1fr auto;gap:9px}
+    input,select{border:1px solid var(--line);background:var(--white);color:var(--text);outline:none;border-radius:15px;padding:13px 14px;width:100%}
+    input:focus,select:focus{border-color:var(--rose);box-shadow:0 0 0 4px rgba(223,181,170,.16)}
+    .add-btn{border:0;background:var(--terra);color:white;min-width:50px;border-radius:15px;font-size:22px;box-shadow:0 8px 18px rgba(169,99,80,.2)}
+    .details-row{display:grid;grid-template-columns:1fr 105px;gap:9px;margin-top:9px}
+    .hint{font-size:10px;color:var(--muted);margin:8px 3px 0}
+
+    .toolbar{padding:0 2px 12px;display:flex;gap:8px;overflow:auto;scrollbar-width:none}
+    .toolbar::-webkit-scrollbar{display:none}
+    .filter{border:1px solid var(--line);background:transparent;color:var(--muted);border-radius:999px;padding:8px 13px;white-space:nowrap;font-size:12px}
+    .filter.active{background:var(--text);color:white;border-color:var(--text)}
+
+    .list-card{padding:7px;overflow:hidden}
+    .item{display:grid;grid-template-columns:38px 1fr auto;align-items:center;gap:8px;padding:12px 9px;border-radius:17px}
+    .item+.item{border-top:1px solid rgba(234,219,210,.55)}
+    .check{width:30px;height:30px;border:1.5px solid #d5b9ad;border-radius:10px;background:transparent;display:grid;place-items:center;color:white;font-size:15px}
+    .item.done .check{background:var(--sage);border-color:var(--sage)}
+    .item.done .product-name{text-decoration:line-through;color:#a59690}
+    .product-name{font-size:14px;font-weight:650}
+    .meta{display:flex;align-items:center;flex-wrap:wrap;gap:5px;margin-top:4px}
+    .tag{padding:4px 7px;background:var(--card2);color:var(--muted);border-radius:999px;font-size:10px}
+    .price{color:var(--terra-dark);font-size:12px;font-weight:700}
+    .delete{width:31px;height:31px;border:0;border-radius:10px;background:transparent;color:#b7a59e;font-size:16px}
+    .empty{padding:44px 18px;text-align:center;color:var(--muted)}
+    .empty .emoji{display:block;font-size:35px;margin-bottom:9px}
+    .empty strong{display:block;color:var(--text);margin-bottom:4px}
+
+    .checkout{padding:16px;margin-bottom:14px}
+    .checkout-title{display:flex;justify-content:space-between;align-items:center;margin-bottom:14px}
+    .checkout-title h2{font-family:Georgia,serif;font-weight:500;font-size:22px;margin:0}
+    .big-total{font-size:24px;font-weight:800;color:var(--terra-dark)}
+    .progress{height:8px;background:#eee0d8;border-radius:99px;overflow:hidden;margin:10px 0 6px}
+    .progress-bar{height:100%;background:var(--sage);width:0%;transition:.25s}
+    .checkout-note{font-size:11px;color:var(--muted)}
+    .buy-actions{display:flex;gap:8px;margin-top:13px}
+    .secondary{flex:1;border:1px solid var(--line);background:var(--white);color:var(--text);padding:11px;border-radius:13px;font-size:12px;font-weight:700}
+    .primary{flex:1;border:0;background:var(--terra);color:#fff;padding:11px;border-radius:13px;font-size:12px;font-weight:700}
+
+    .bottom{display:flex;justify-content:space-between;align-items:center;padding:13px 4px 0;color:var(--muted);font-size:11px}
+    .clear{border:0;background:none;color:var(--terra-dark);font-size:11px;font-weight:700}
+    .toast{position:fixed;left:50%;bottom:22px;transform:translate(-50%,20px);background:#403532;color:#fff;padding:10px 15px;border-radius:999px;font-size:12px;opacity:0;pointer-events:none;transition:.25s;z-index:20}
+    .toast.show{opacity:1;transform:translate(-50%,0)}
+
+    .setup{padding:18px;margin-top:8px}
+    .setup h2{font-family:Georgia,serif;font-weight:500;margin:0 0 7px}
+    .setup p{font-size:12px;color:var(--muted);line-height:1.5}
+    .setup code{background:var(--card2);padding:2px 5px;border-radius:5px}
+    .hidden{display:none!important}
+    @media(min-width:600px){.app{padding-top:45px}}
+  </style>
+</head>
+
+<body>
+<main class="app">
+  <header>
+    <div>
+      <p class="eyebrow">Nuestro pequeño hogar</p>
+      <h1>Lista de compra</h1>
+      <p class="subtitle">Pequeñas cosas que hacen nuestra casa nuestra ♡</p>
+    </div>
+    <div class="home-icon">🏡</div>
+  </header>
+
+  <p class="connection"><span><i class="dot" id="connectionDot"></i><span id="connectionText">Preparando sincronización...</span></span></p>
+
+  <div class="tabs">
+    <button class="tab active" data-tab="list">📝 Lista</button>
+    <button class="tab" data-tab="shop">🛒 Estamos comprando</button>
+  </div>
+
+  <section id="listView">
+    <div class="summary">
+      <div class="stat"><span class="stat-number" id="totalCount">0</span><span class="stat-label">productos</span></div>
+      <div class="stat"><span class="stat-number" id="pendingCount">0</span><span class="stat-label">pendientes</span></div>
+      <div class="stat"><span class="stat-number" id="listPrice">—</span><span class="stat-label">presupuesto</span></div>
+    </div>
+
+    <section class="card add-card">
+      <div class="add-row">
+        <input id="productInput" type="text" placeholder="¿Qué necesitamos? ✨" autocomplete="off">
+        <button class="add-btn" id="addBtn">+</button>
+      </div>
+      <div class="details-row">
+        <select id="categoryInput">
+          <option value="🛒 General">🛒 General</option>
+          <option value="🥑 Alimentación">🥑 Alimentación</option>
+          <option value="🧽 Limpieza">🧽 Limpieza</option>
+          <option value="🛁 Baño">🛁 Baño</option>
+          <option value="🍳 Cocina">🍳 Cocina</option>
+          <option value="🛏️ Dormitorio">🛏️ Dormitorio</option>
+          <option value="🕯️ Decoración">🕯️ Decoración</option>
+          <option value="🐈 Gatos">🐈 Gatos</option>
+        </select>
+        <input id="plannedPriceInput" type="number" min="0" step="0.01" placeholder="Precio €">
+      </div>
+      <p class="hint">💡 El precio es opcional. Si aún no sabéis cuánto cuesta, dejadlo vacío.</p>
+    </section>
+
+    <nav class="toolbar">
+      <button class="filter active" data-filter="all">Todo</button>
+      <button class="filter" data-filter="pending">Pendiente</button>
+      <button class="filter" data-filter="done">Comprado</button>
+    </nav>
+
+    <section class="card list-card">
+      <div id="list"></div>
+      <div class="bottom">
+        <span id="statusText">La lista está vacía</span>
+        <button class="clear" id="clearDone">Borrar comprados</button>
+      </div>
+    </section>
+  </section>
+
+  <section id="shopView" class="hidden">
+    <div class="card checkout">
+      <div class="checkout-title">
+        <h2>🛒 Compra de hoy</h2>
+        <span class="big-total" id="shopTotal">€0,00</span>
+      </div>
+      <div class="progress"><div class="progress-bar" id="progressBar"></div></div>
+      <div class="checkout-note" id="progressText">0 productos comprados</div>
+      <div class="buy-actions">
+        <button class="secondary" id="backToList">← Ver lista</button>
+        <button class="primary" id="finishShopping">Terminar compra</button>
+      </div>
+    </div>
+
+    <section class="card list-card">
+      <div id="shopList"></div>
+    </section>
+  </section>
+
+  <section id="setupMessage" class="card setup hidden">
+    <h2>💗 Falta conectar la sincronización</h2>
+    <p>La app funciona, pero para que Alyssa y Paul veáis exactamente la misma lista desde móviles distintos hay que conectar una base de datos de Supabase.</p>
+    <p>Cuando la conectemos, cualquier producto que añada uno aparecerá automáticamente en el móvil del otro.</p>
+  </section>
+</main>
+
+<div class="toast" id="toast">Hecho ♡</div>
+
+<script>
+  /*
+   * ============================================================
+   * CONFIGURACIÓN DE SINCRONIZACIÓN
+   * ============================================================
+   * Crea un proyecto gratuito en Supabase y pega aquí:
+   * SUPABASE_URL = Project URL
+   * SUPABASE_ANON_KEY = anon/public key
+   *
+   * NO pongas nunca aquí una service_role key.
+   */
+  const SUPABASE_URL = "PON_AQUI_TU_SUPABASE_URL";
+  const SUPABASE_ANON_KEY = "PON_AQUI_TU_SUPABASE_ANON_KEY";
+
+  const supabaseReady =
+    SUPABASE_URL.startsWith("https://") &&
+    !SUPABASE_URL.includes("PON_AQUI") &&
+    !SUPABASE_ANON_KEY.includes("PON_AQUI");
+
+  let supabaseClient = null;
+  if (supabaseReady) {
+    supabaseClient = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+  }
+
+  const LOCAL_KEY = "nuestro-hogar-shopping-v2";
+  let items = JSON.parse(localStorage.getItem(LOCAL_KEY) || "[]");
+  let currentFilter = "all";
+  let currentTab = "list";
+
+  const $ = id => document.getElementById(id);
+
+  function money(v) {
+    if (v === null || v === undefined || v === "") return "—";
+    return new Intl.NumberFormat("es-ES",{style:"currency",currency:"EUR"}).format(Number(v)||0);
+  }
+
+  function saveLocal() {
+    localStorage.setItem(LOCAL_KEY, JSON.stringify(items));
+  }
+
+  function toast(message) {
+    $("toast").textContent = message;
+    $("toast").classList.add("show");
+    clearTimeout(window._toast);
+    window._toast = setTimeout(() => $("toast").classList.remove("show"), 1500);
+  }
+
+  function setConnection(online, text) {
+    $("connectionDot").classList.toggle("online", online);
+    $("connectionText").textContent = text;
+  }
+
+  function render() {
+    renderList();
+    renderShop();
+    renderStats();
+  }
+
+  function renderStats() {
+    const pending = items.filter(i => !i.done).length;
+    const planned = items.reduce((s,i) => s + (Number(i.planned_price)||0),0);
+    $("totalCount").textContent = items.length;
+    $("pendingCount").textContent = pending;
+    $("listPrice").textContent = planned ? money(planned) : "—";
+    $("statusText").textContent = items.length
+      ? `${pending} ${pending === 1 ? "producto pendiente" : "productos pendientes"}`
+      : "La lista está vacía";
+  }
+
+  function visibleItems() {
+    return items.filter(i =>
+      currentFilter === "all" ? true :
+      currentFilter === "pending" ? !i.done : i.done
+    );
+  }
+
+  function itemHTML(item, shopping=false) {
+    const actual = item.actual_price !== null && item.actual_price !== undefined
+      ? `<span class="price">${money(item.actual_price)}</span>` : "";
+    const planned = !shopping && item.planned_price
+      ? `<span class="price">prev. ${money(item.planned_price)}</span>` : "";
+
+    return `
+      <div class="item ${item.done ? "done":""}" data-id="${item.id}">
+        <button class="check" onclick="toggleItem('${item.id}')">${item.done ? "✓":""}</button>
+        <div>
+          <div class="product-name">${escapeHTML(item.name)}</div>
+          <div class="meta">
+            <span class="tag">${escapeHTML(item.category)}</span>
+            ${actual}${planned}
+          </div>
+        </div>
+        <button class="delete" onclick="deleteItem('${item.id}')">×</button>
+      </div>`;
+  }
+
+  function renderList() {
+    const visible = visibleItems();
+    $("list").innerHTML = visible.length
+      ? visible.map(i => itemHTML(i,false)).join("")
+      : `<div class="empty"><span class="emoji">🛍️</span><strong>${currentFilter==="done"?"Aún no hay compras":"Tu lista está vacía"}</strong><span>Añade algo que necesitemos para casa.</span></div>`;
+  }
+
+  function renderShop() {
+    const shopping = items.filter(i => !i.done);
+    const bought = items.filter(i => i.done && i.actual_price !== null && i.actual_price !== undefined);
+    const allBought = items.filter(i => i.done).length;
+    const total = bought.reduce((s,i) => s + (Number(i.actual_price)||0),0);
+    $("shopTotal").textContent = money(total);
+    const progress = items.length ? Math.round((allBought/items.length)*100) : 0;
+    $("progressBar").style.width = progress + "%";
+    $("progressText").textContent = `${allBought} de ${items.length} productos comprados`;
+
+    $("shopList").innerHTML = shopping.length
+      ? shopping.map(i => `
+        <div class="item" data-id="${i.id}">
+          <button class="check" onclick="buyItem('${i.id}')">✓</button>
+          <div>
+            <div class="product-name">${escapeHTML(i.name)}</div>
+            <div class="meta">
+              <span class="tag">${escapeHTML(i.category)}</span>
+              ${i.planned_price ? `<span class="price">prev. ${money(i.planned_price)}</span>`:""}
+            </div>
+          </div>
+          <div style="width:82px">
+            <input class="actual-price" id="price-${i.id}" type="number" min="0" step="0.01" placeholder="€ precio" style="padding:9px 8px;font-size:12px">
+          </div>
+        </div>`).join("")
+      : `<div class="empty"><span class="emoji">🧾</span><strong>¡Todo comprado!</strong><span>El total de esta compra es ${money(total)}.</span></div>`;
+  }
+
+  function addItem() {
+    const name = $("productInput").value.trim();
+    if (!name) { $("productInput").focus(); return; }
+
+    const planned = $("plannedPriceInput").value === "" ? null : Number($("plannedPriceInput").value);
+    const item = {
+      id: crypto.randomUUID ? crypto.randomUUID() : String(Date.now()),
+      name,
+      category: $("categoryInput").value,
+      planned_price: planned,
+      actual_price: null,
+      done: false,
+      created_at: new Date().toISOString()
+    };
+
+    items.unshift(item);
+    saveLocal();
+    render();
+    $("productInput").value = "";
+    $("plannedPriceInput").value = "";
+    $("productInput").focus();
+    syncInsert(item);
+    toast("Añadido a la lista ♡");
+  }
+
+  async function syncInsert(item) {
+    if (!supabaseClient) return;
+    const {error} = await supabaseClient.from("shopping_items").insert(item);
+    if (error) {
+      console.error(error);
+      setConnection(false,"Sincronización pendiente");
+    }
+  }
+
+  window.toggleItem = async function(id) {
+    const item = items.find(i=>i.id===id);
+    if (!item) return;
+    item.done = !item.done;
+    saveLocal();
+    render();
+
+    if (supabaseClient) {
+      const {error}=await supabaseClient.from("shopping_items").update({done:item.done}).eq("id",id);
+      if(error) console.error(error);
+    }
+  };
+
+  window.buyItem = async function(id) {
+    const input = $("price-"+id);
+    const value = input && input.value !== "" ? Number(input.value) : null;
+    const item = items.find(i=>i.id===id);
+    if (!item) return;
+
+    item.actual_price = value;
+    item.done = true;
+    saveLocal();
+    render();
+
+    if (supabaseClient) {
+      const {error}=await supabaseClient.from("shopping_items")
+        .update({done:true,actual_price:value}).eq("id",id);
+      if(error) console.error(error);
+    }
+    toast(value !== null ? "Compra añadida al total ♡" : "Marcado como comprado");
+  };
+
+  window.deleteItem = async function(id) {
+    items = items.filter(i=>i.id!==id);
+    saveLocal();
+    render();
+
+    if (supabaseClient) {
+      const {error}=await supabaseClient.from("shopping_items").delete().eq("id",id);
+      if(error) console.error(error);
+    }
+    toast("Eliminado");
+  };
+
+  async function clearDone() {
+    const ids = items.filter(i=>i.done).map(i=>i.id);
+    if(!ids.length) return;
+    items=items.filter(i=>!i.done);
+    saveLocal();
+    render();
+
+    if(supabaseClient) {
+      const {error}=await supabaseClient.from("shopping_items").delete().in("id",ids);
+      if(error) console.error(error);
+    }
+    toast("Comprados borrados ♡");
+  }
+
+  function finishShopping() {
+    currentTab="list";
+    updateTabs();
+    toast("Compra guardada ♡");
+  }
+
+  function updateTabs() {
+    $("listView").classList.toggle("hidden",currentTab!=="list");
+    $("shopView").classList.toggle("hidden",currentTab!=="shop");
+    document.querySelectorAll(".tab").forEach(t=>t.classList.toggle("active",t.dataset.tab===currentTab));
+  }
+
+  function escapeHTML(v) {
+    return String(v).replaceAll("&","&amp;").replaceAll("<","&lt;").replaceAll(">","&gt;").replaceAll('"',"&quot;").replaceAll("'","&#039;");
+  }
+
+  async function loadRemote() {
+    if(!supabaseClient) {
+      setConnection(false,"Solo en este móvil · falta configurar sincronización");
+      $("setupMessage").classList.remove("hidden");
+      return;
+    }
+
+    const {data,error}=await supabaseClient.from("shopping_items").select("*").order("created_at",{ascending:false});
+    if(error) {
+      console.error(error);
+      setConnection(false,"No se pudo conectar");
+      return;
+    }
+
+    items=data || [];
+    saveLocal();
+    render();
+    setConnection(true,"Sincronizado · compartido");
+  }
+
+  function subscribeRealtime() {
+    if(!supabaseClient) return;
+    supabaseClient.channel("shopping-live")
+      .on("postgres_changes",{event:"*",schema:"public",table:"shopping_items"},payload=>{
+        const row=payload.new || payload.old;
+        if(payload.eventType==="INSERT") {
+          if(!items.some(i=>i.id===row.id)) items.push(row);
+        } else if(payload.eventType==="UPDATE") {
+          const index=items.findIndex(i=>i.id===row.id);
+          if(index>=0) items[index]=row;
+        } else if(payload.eventType==="DELETE") {
+          items=items.filter(i=>i.id!==row.id);
+        }
+        saveLocal();
+        render();
+      }).subscribe();
+  }
+
+  document.querySelectorAll(".tab").forEach(t=>t.addEventListener("click",()=>{
+    currentTab=t.dataset.tab; updateTabs(); render();
+  }));
+  document.querySelectorAll(".filter").forEach(b=>b.addEventListener("click",()=>{
+    document.querySelectorAll(".filter").forEach(x=>x.classList.remove("active"));
+    b.classList.add("active"); currentFilter=b.dataset.filter; render();
+  }));
+  $("addBtn").addEventListener("click",addItem);
+  $("productInput").addEventListener("keydown",e=>{if(e.key==="Enter")addItem()});
+  $("plannedPriceInput").addEventListener("keydown",e=>{if(e.key==="Enter")addItem()});
+  $("clearDone").addEventListener("click",clearDone);
+  $("backToList").addEventListener("click",()=>{currentTab="list";updateTabs()});
+  $("finishShopping").addEventListener("click",finishShopping);
+
+  render();
+  loadRemote();
+  subscribeRealtime();
+</script>
+</body>
+</html>
