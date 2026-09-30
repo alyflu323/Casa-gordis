@@ -7,7 +7,6 @@
   <title>Nuestro Hogar 🏡</title>
 
   <!-- Supabase: necesario para sincronizar entre móviles -->
-  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 
   <style>
     :root {
@@ -249,370 +248,45 @@
 <div class="toast" id="toast">Hecho ♡</div>
 
 <script>
-  /*
-   * ============================================================
-   * CONFIGURACIÓN DE SINCRONIZACIÓN
-   * ============================================================
-   * Crea un proyecto gratuito en Supabase y pega aquí:
-   * SUPABASE_URL = Project URL
-   * SUPABASE_ANON_KEY = anon/public key
-   *
-   * NO pongas nunca aquí una service_role key.
-   */
-  const SUPABASE_URL = "https://esjkabcbxnrcklcwncap.supabase.co";
-  const SUPABASE_ANON_KEY = "sb_publishable_hFUuotzrcj574thQhQQedA_bbjmomnV";
-
-  const supabaseReady =
-    SUPABASE_URL.startsWith("https://") &&
-    !SUPABASE_URL.includes("PON_AQUI") &&
-    !SUPABASE_ANON_KEY.includes("PON_AQUI");
-
-  let supabaseClient = null;
-  if (supabaseReady) {
-    supabaseClient = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
-  }
-
-  const LOCAL_KEY = "nuestro-hogar-shopping-v2";
-  let items = JSON.parse(localStorage.getItem(LOCAL_KEY) || "[]");
-  let currentFilter = "all";
-  let currentTab = "list";
-
-  const $ = id => document.getElementById(id);
-
-  function money(v) {
-    if (v === null || v === undefined || v === "") return "—";
-    return new Intl.NumberFormat("es-ES",{style:"currency",currency:"EUR"}).format(Number(v)||0);
-  }
-
-  function saveLocal() {
-    localStorage.setItem(LOCAL_KEY, JSON.stringify(items));
-  }
-
-  function toast(message) {
-    $("toast").textContent = message;
-    $("toast").classList.add("show");
-    clearTimeout(window._toast);
-    window._toast = setTimeout(() => $("toast").classList.remove("show"), 1500);
-  }
-
-  function setConnection(online, text) {
-    $("connectionDot").classList.toggle("online", online);
-    $("connectionText").textContent = text;
-  }
-
-  function render() {
-    renderList();
-    renderShop();
-    renderStats();
-    renderBudget();
-    renderHistory();
-  }
-
-  function renderBudget() {
-    const budget = Number(localStorage.getItem("our-home-budget") || 0);
-    $("budgetInput").value = budget || "";
-    const planned = items.reduce((s,i) => s + ((Number(i.planned_price)||0) * (Number(i.quantity)||1)),0);
-    const bar = budget ? Math.min(100, Math.round((planned / budget) * 100)) : 0;
-    $("budgetBar").style.width = bar + "%";
-    $("budgetText").textContent = budget
-      ? `${money(planned)} estimados de ${money(budget)} · ${planned <= budget ? money(budget-planned)+" disponibles" : money(planned-budget)+" por encima"}`
-      : "Sin presupuesto definido";
-  }
-
-  function renderHistory() {
-    const history = JSON.parse(localStorage.getItem("our-home-history") || "[]");
-    $("historyList").innerHTML = history.length ? history.map((h,idx) => `
-      <div style="padding:13px 10px;border-bottom:1px solid var(--line)">
-        <div style="display:flex;justify-content:space-between;gap:10px">
-          <div><strong style="font-size:13px">${escapeHTML(h.date)}</strong><div style="font-size:10px;color:var(--muted);margin-top:3px">${h.count} productos</div></div>
-          <strong style="color:var(--terra-dark)">${money(h.total)}</strong>
-        </div>
-        <button class="secondary" style="width:100%;margin-top:9px" onclick="repeatPurchase(${idx})">↻ Añadir estos productos otra vez</button>
-      </div>`).join("") :
-      `<div class="empty"><span class="emoji">🧾</span><strong>Aún no hay compras anteriores</strong><span>Cuando terminéis una compra aparecerá aquí.</span></div>`;
-  }
-
-  window.repeatPurchase = function(index) {
-    const history = JSON.parse(localStorage.getItem("our-home-history") || "[]");
-    const h = history[index];
-    if (!h) return;
-    const now = new Date().toISOString();
-    const newItems = h.items.map(x => ({
-      ...x,
-      id: crypto.randomUUID ? crypto.randomUUID() : String(Date.now()+Math.random()),
-      done:false, actual_price:null, created_at:now
-    }));
-    items = [...newItems, ...items];
-    saveLocal();
-    render();
-    toast("Añadido a la lista ♡");
-  }
-
-  function renderStats() {
-    const pending = items.filter(i => !i.done).length;
-    const planned = items.reduce((s,i) => s + ((Number(i.planned_price)||0) * (Number(i.quantity)||1)),0);
-    $("totalCount").textContent = items.length;
-    $("pendingCount").textContent = pending;
-    $("listPrice").textContent = planned ? money(planned) : "—";
-    $("statusText").textContent = items.length
-      ? `${pending} ${pending === 1 ? "producto pendiente" : "productos pendientes"}`
-      : "La lista está vacía";
-  }
-
-  function visibleItems() {
-    return items.filter(i =>
-      currentFilter === "all" ? true :
-      currentFilter === "pending" ? !i.done : i.done
-    );
-  }
-
-  function itemHTML(item, shopping=false) {
-    const actual = item.actual_price !== null && item.actual_price !== undefined
-      ? `<span class="price">${money(item.actual_price)}</span>` : "";
-    const planned = !shopping && item.planned_price
-      ? `<span class="price">prev. ${money(item.planned_price)}</span>` : "";
-
-    return `
-      <div class="item ${item.done ? "done":""}" data-id="${item.id}">
-        <button class="check" onclick="toggleItem('${item.id}')">${item.done ? "✓":""}</button>
-        <div>
-          <div class="product-name">${escapeHTML(item.name)}</div>
-          <div class="meta">
-            <span class="tag">${escapeHTML(item.category)}</span>
-            ${actual}${planned}
-          </div>
-        </div>
-        <button class="delete" onclick="deleteItem('${item.id}')">×</button>
-      </div>`;
-  }
-
-  function renderList() {
-    const visible = visibleItems();
-    $("list").innerHTML = visible.length
-      ? visible.map(i => itemHTML(i,false)).join("")
-      : `<div class="empty"><span class="emoji">🛍️</span><strong>${currentFilter==="done"?"Aún no hay compras":"Tu lista está vacía"}</strong><span>Añade algo que necesitemos para casa.</span></div>`;
-  }
-
-  function renderShop() {
-    const shopping = items.filter(i => !i.done);
-    const bought = items.filter(i => i.done && i.actual_price !== null && i.actual_price !== undefined);
-    const allBought = items.filter(i => i.done).length;
-    const total = bought.reduce((s,i) => s + ((Number(i.actual_price)||0) * (Number(i.quantity)||1)),0);
-    $("shopTotal").textContent = money(total);
-    const progress = items.length ? Math.round((allBought/items.length)*100) : 0;
-    $("progressBar").style.width = progress + "%";
-    $("progressText").textContent = `${allBought} de ${items.length} productos comprados`;
-
-    $("shopList").innerHTML = shopping.length
-      ? shopping.map(i => `
-        <div class="item" data-id="${i.id}">
-          <button class="check" onclick="buyItem('${i.id}')">✓</button>
-          <div>
-            <div class="product-line">
-              <span class="product-name">${escapeHTML(i.name)}</span>
-              <span class="tag">${escapeHTML(i.category)}</span>
-              <span class="tag">×${i.quantity || 1}</span>
-            </div>
-            <div class="meta"><span style="font-size:10px;color:var(--muted)">${i.person === "Pol" ? "👨 Pol" : "👩 Alyssa"}</span>${i.planned_price ? `<span class="price">prev. ${money(i.planned_price)}</span>`:""}</div>
-          </div>
-          <div style="width:82px">
-            <input class="actual-price" id="price-${i.id}" type="number" min="0" step="0.01" placeholder="€ precio" style="padding:9px 8px;font-size:12px">
-          </div>
-        </div>`).join("")
-      : `<div class="empty"><span class="emoji">🧾</span><strong>¡Todo comprado!</strong><span>El total de esta compra es ${money(total)}.</span></div>`;
-  }
-
-  function addItem() {
-    const name = $("productInput").value.trim();
-    if (!name) { $("productInput").focus(); return; }
-
-    const planned = $("plannedPriceInput").value === "" ? null : Number($("plannedPriceInput").value);
-    const quantity = Math.max(1, parseInt($("quantityInput").value || "1", 10));
-    const person = $("personInput").value;
-    const item = {
-      id: crypto.randomUUID ? crypto.randomUUID() : String(Date.now()),
-      name,
-      category: $("categoryInput").value,
-      planned_price: planned,
-      actual_price: null,
-      quantity,
-      person,
-      barcode: null,
-      done: false,
-      created_at: new Date().toISOString()
-    };
-
-    items.unshift(item);
-    saveLocal();
-    render();
-    $("productInput").value = "";
-    $("plannedPriceInput").value = "";
-    $("quantityInput").value = "1";
-    $("productInput").focus();
-    syncInsert(item);
-    toast("Añadido a la lista ♡");
-  }
-
-  async function syncInsert(item) {
-    if (!supabaseClient) return;
-    const {error} = await supabaseClient.from("shopping_items").insert(item);
-    if (error) {
-      console.error(error);
-      setConnection(false,"Sincronización pendiente");
-    }
-  }
-
-  window.toggleItem = async function(id) {
-    const item = items.find(i=>i.id===id);
-    if (!item) return;
-    item.done = !item.done;
-    saveLocal();
-    render();
-
-    if (supabaseClient) {
-      const {error}=await supabaseClient.from("shopping_items").update({done:item.done}).eq("id",id);
-      if(error) console.error(error);
-    }
-  };
-
-  window.buyItem = async function(id) {
-    const input = $("price-"+id);
-    const value = input && input.value !== "" ? Number(input.value) : null;
-    const item = items.find(i=>i.id===id);
-    if (!item) return;
-
-    item.actual_price = value;
-    item.done = true;
-    saveLocal();
-    render();
-
-    if (supabaseClient) {
-      const {error}=await supabaseClient.from("shopping_items")
-        .update({done:true,actual_price:value}).eq("id",id);
-      if(error) console.error(error);
-    }
-    toast(value !== null ? "Compra añadida al total ♡" : "Marcado como comprado");
-  };
-
-  window.deleteItem = async function(id) {
-    items = items.filter(i=>i.id!==id);
-    saveLocal();
-    render();
-
-    if (supabaseClient) {
-      const {error}=await supabaseClient.from("shopping_items").delete().eq("id",id);
-      if(error) console.error(error);
-    }
-    toast("Eliminado");
-  };
-
-  async function clearDone() {
-    const ids = items.filter(i=>i.done).map(i=>i.id);
-    if(!ids.length) return;
-    items=items.filter(i=>!i.done);
-    saveLocal();
-    render();
-
-    if(supabaseClient) {
-      const {error}=await supabaseClient.from("shopping_items").delete().in("id",ids);
-      if(error) console.error(error);
-    }
-    toast("Comprados borrados ♡");
-  }
-
-  function finishShopping() {
-    const bought = items.filter(i => i.done);
-    const total = bought.reduce((s,i) => s + ((Number(i.actual_price)||0) * (Number(i.quantity)||1)),0);
-    if (bought.length) {
-      const history = JSON.parse(localStorage.getItem("our-home-history") || "[]");
-      history.unshift({
-        date: new Intl.DateTimeFormat("es-ES",{dateStyle:"medium"}).format(new Date()),
-        count:bought.reduce((s,i)=>s+(Number(i.quantity)||1),0),
-        total,
-        items:bought.map(i=>({...i}))
-      });
-      localStorage.setItem("our-home-history", JSON.stringify(history.slice(0,20)));
-    }
-    currentTab="history";
-    updateTabs();
-    render();
-    toast("Compra guardada en el historial ♡");
-  }
-
-  function updateTabs() {
-    document.body.classList.toggle("shopping-mode", currentTab === "shop");
-    $("listView").classList.toggle("hidden",currentTab!=="list");
-    $("shopView").classList.toggle("hidden",currentTab!=="shop");
-    $("historyView").classList.toggle("hidden",currentTab!=="history");
-    document.querySelectorAll(".tab").forEach(t=>t.classList.toggle("active",t.dataset.tab===currentTab));
-  }
-
-  function escapeHTML(v) {
-    return String(v).replaceAll("&","&amp;").replaceAll("<","&lt;").replaceAll(">","&gt;").replaceAll('"',"&quot;").replaceAll("'","&#039;");
-  }
-
-  async function loadRemote() {
-    if(!supabaseClient) {
-      setConnection(false,"Solo en este móvil · falta configurar sincronización");
-      $("setupMessage").classList.remove("hidden");
-      return;
-    }
-
-    const {data,error}=await supabaseClient.from("shopping_items").select("*").order("created_at",{ascending:false});
-    if(error) {
-      console.error(error);
-      setConnection(false,"No se pudo conectar");
-      return;
-    }
-
-    items=data || [];
-    saveLocal();
-    render();
-    setConnection(true,"Sincronizado · compartido");
-  }
-
-  function subscribeRealtime() {
-    if(!supabaseClient) return;
-    supabaseClient.channel("shopping-live")
-      .on("postgres_changes",{event:"*",schema:"public",table:"shopping_items"},payload=>{
-        const row=payload.new || payload.old;
-        if(payload.eventType==="INSERT") {
-          if(!items.some(i=>i.id===row.id)) items.push(row);
-        } else if(payload.eventType==="UPDATE") {
-          const index=items.findIndex(i=>i.id===row.id);
-          if(index>=0) items[index]=row;
-        } else if(payload.eventType==="DELETE") {
-          items=items.filter(i=>i.id!==row.id);
-        }
-        saveLocal();
-        render();
-      }).subscribe();
-  }
-
-  document.querySelectorAll(".tab").forEach(t=>t.addEventListener("click",()=>{
-    currentTab=t.dataset.tab; updateTabs(); render();
-  }));
-  document.querySelectorAll(".filter").forEach(b=>b.addEventListener("click",()=>{
-    document.querySelectorAll(".filter").forEach(x=>x.classList.remove("active"));
-    b.classList.add("active"); currentFilter=b.dataset.filter; render();
-  }));
-  $("addBtn").addEventListener("click",addItem);
-  $("productInput").addEventListener("keydown",e=>{if(e.key==="Enter")addItem()});
-  $("plannedPriceInput").addEventListener("keydown",e=>{if(e.key==="Enter")addItem()});
-  $("clearDone").addEventListener("click",clearDone);
-  $("backToList").addEventListener("click",()=>{currentTab="list";updateTabs()});
-  $("finishShopping").addEventListener("click",finishShopping);
-  $("budgetInput").addEventListener("change", () => {
-    localStorage.setItem("our-home-budget", String(Number($("budgetInput").value || 0)));
-    renderBudget();
-  });
-
-
-  updateTabs();
-  render();
-  if (!supabaseReady) $("setupMessage").classList.remove("hidden");
-  loadRemote();
-  subscribeRealtime();
+(function(){
+"use strict";
+const SUPABASE_URL="https://esjkabcbxnrcklcwncap.supabase.co";
+const SUPABASE_KEY="sb_publishable_hFUuotzrcj574thQhQQedA_bbjmomnV";
+const LOCAL_KEY="nuestro-hogar-shopping-v4";
+let items=loadLocal(), currentTab="list", currentFilter="all", supabaseClient=null;
+const $=id=>document.getElementById(id);
+function loadLocal(){try{const x=JSON.parse(localStorage.getItem(LOCAL_KEY)||"[]");return Array.isArray(x)?x:[]}catch(e){return[]}}
+function saveLocal(){try{localStorage.setItem(LOCAL_KEY,JSON.stringify(items))}catch(e){}}
+function uid(){return window.crypto&&typeof crypto.randomUUID==="function"?crypto.randomUUID():Date.now().toString(36)+Math.random().toString(36).slice(2)}
+function money(v){return new Intl.NumberFormat("es-ES",{style:"currency",currency:"EUR"}).format(Number(v)||0)}
+function esc(v){return String(v==null?"":v).replace(/[&<>"']/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;","\"":"&quot;","'":"&#039;"}[c]))}
+function toast(t){$("toast").textContent=t;$("toast").classList.add("show");clearTimeout(window.__toast);window.__toast=setTimeout(()=>$("toast").classList.remove("show"),1500)}
+function status(ok,t){$("connectionDot").classList.toggle("online",!!ok);$("connectionText").textContent=t}
+function render(){renderTabs();renderStats();renderBudget();renderList();renderShop();renderHistory()}
+function renderTabs(){["listView","shopView","historyView"].forEach(id=>$(id).classList.add("hidden"));$(currentTab+"View").classList.remove("hidden");document.body.classList.toggle("shopping-mode",currentTab==="shop");document.querySelectorAll(".tab").forEach(b=>b.classList.toggle("active",b.dataset.tab===currentTab))}
+function renderStats(){const pending=items.filter(x=>!x.done).length;const planned=items.reduce((s,x)=>s+(Number(x.planned_price)||0)*(Number(x.quantity)||1),0);$("totalCount").textContent=items.length;$("pendingCount").textContent=pending;$("listPrice").textContent=planned?money(planned):"—";$("statusText").textContent=items.length?pending+" "+(pending===1?"producto pendiente":"productos pendientes"):"La lista está vacía"}
+function renderBudget(){const b=Number(localStorage.getItem("our-home-budget")||0);$("budgetInput").value=b||"";const p=items.reduce((s,x)=>s+(Number(x.planned_price)||0)*(Number(x.quantity)||1),0);$("budgetBar").style.width=(b?Math.min(100,p/b*100):0)+"%";$("budgetText").textContent=b?money(p)+" estimados de "+money(b)+" · "+(p<=b?money(b-p)+" disponibles":money(p-b)+" por encima"):"Sin presupuesto definido"}
+function filtered(){return currentFilter==="pending"?items.filter(x=>!x.done):currentFilter==="done"?items.filter(x=>x.done):items}
+function listRow(x){return '<div class="item '+(x.done?"done":"")+'"><button class="check" data-action="toggle" data-id="'+esc(x.id)+'" type="button">'+(x.done?"✓":"")+'</button><div><div class="product-line"><span class="product-name">'+esc(x.name)+'</span><span class="tag">'+esc(x.category||"🛒 General")+'</span><span class="tag">×'+(Number(x.quantity)||1)+'</span></div><div class="meta"><span class="tag">'+(x.person==="Pol"?"👨 Pol":"👩 Alyssa")+'</span>'+(x.planned_price!=null?'<span class="price">prev. '+money(x.planned_price)+'</span>':"")+(x.actual_price!=null?'<span class="price">real '+money(x.actual_price)+'</span>':"")+'</div></div><button class="delete" data-action="delete" data-id="'+esc(x.id)+'" type="button">×</button></div>'}
+function renderList(){const a=filtered();$("list").innerHTML=a.length?a.map(listRow).join(""): '<div class="empty"><span class="emoji">🛍️</span><strong>'+(currentFilter==="done"?"Aún no hay compras":"Tu lista está vacía")+'</strong><span>Añade algo que necesitemos para casa.</span></div>'}
+function renderShop(){const active=items.filter(x=>!x.done);const bought=items.filter(x=>x.done);const total=bought.reduce((s,x)=>s+(Number(x.actual_price)||0)*(Number(x.quantity)||1),0);$("shopTotal").textContent=money(total);$("progressBar").style.width=(items.length?bought.length/items.length*100:0)+"%";$("progressText").textContent=bought.length+" de "+items.length+" productos comprados";$("shopList").innerHTML=active.length?active.map(x=>'<div class="item"><button class="check" data-action="buy" data-id="'+esc(x.id)+'" type="button">✓</button><div><div class="product-line"><span class="product-name">'+esc(x.name)+'</span><span class="tag">'+esc(x.category||"🛒 General")+'</span><span class="tag">×'+(Number(x.quantity)||1)+'</span></div><div class="meta"><span class="tag">'+(x.person==="Pol"?"👨 Pol":"👩 Alyssa")+'</span>'+(x.planned_price!=null?'<span class="price">prev. '+money(x.planned_price)+'</span>':"")+'</div></div><input class="actual-price" data-price-id="'+esc(x.id)+'" type="number" min="0" step="0.01" placeholder="€ real"></div>').join(""): '<div class="empty"><span class="emoji">🛒</span><strong>¡Todo comprado!</strong><span>El total de esta compra es '+money(total)+'.</span></div>'}
+function hist(){try{const x=JSON.parse(localStorage.getItem("our-home-history")||"[]");return Array.isArray(x)?x:[]}catch(e){return[]}}
+function renderHistory(){const h=hist();$("historyList").innerHTML=h.length?h.map((x,i)=>'<div style="padding:13px 10px;border-bottom:1px solid var(--line)"><div style="display:flex;justify-content:space-between;gap:10px"><div><strong style="font-size:13px">'+esc(x.date)+'</strong><div style="font-size:10px;color:var(--muted);margin-top:3px">'+x.count+' unidades</div></div><strong style="color:var(--terra-dark)">'+money(x.total)+'</strong></div><button class="secondary" style="width:100%;margin-top:9px" data-action="repeat" data-index="'+i+'" type="button">↻ Añadir estos productos otra vez</button></div>').join(""):'<div class="empty"><span class="emoji">🧾</span><strong>Aún no hay compras anteriores</strong><span>Cuando terminéis una compra aparecerá aquí.</span></div>'}
+function addItem(){const name=$("productInput").value.trim();if(!name){$("productInput").focus();return}const q=Math.max(1,parseInt($("quantityInput").value||"1",10)||1);const p=$("plannedPriceInput").value===""?null:Number($("plannedPriceInput").value);const x={id:uid(),name,category:$("categoryInput").value,planned_price:p,actual_price:null,quantity:q,person:$("personInput").value,done:false,created_at:new Date().toISOString()};items.unshift(x);saveLocal();render();$("productInput").value="";$("plannedPriceInput").value="";$("quantityInput").value="1";$("productInput").focus();toast("Añadido a la lista ♡");syncInsert(x)}
+async function syncInsert(x){if(!supabaseClient)return;const {error}=await supabaseClient.from("shopping_items").insert(x);if(error){console.error(error);status(false,"Lista local · pendiente de sincronización")}}
+async function remoteUpdate(id,p){if(!supabaseClient)return;const {error}=await supabaseClient.from("shopping_items").update(p).eq("id",id);if(error)console.error(error)}
+async function toggle(id){const x=items.find(a=>a.id===id);if(!x)return;x.done=!x.done;saveLocal();render();await remoteUpdate(id,{done:x.done})}
+async function buy(id){const el=document.querySelector('[data-price-id="'+CSS.escape(id)+'"]');const value=el&&el.value!==""?Number(el.value):null;const x=items.find(a=>a.id===id);if(!x)return;x.done=true;x.actual_price=value;saveLocal();render();await remoteUpdate(id,{done:true,actual_price:value});toast(value!=null?"Añadido al total ♡":"Marcado como comprado")}
+async function del(id){items=items.filter(x=>x.id!==id);saveLocal();render();if(supabaseClient)await supabaseClient.from("shopping_items").delete().eq("id",id);toast("Eliminado")}
+async function clearDone(){const ids=items.filter(x=>x.done).map(x=>x.id);if(!ids.length)return;items=items.filter(x=>!x.done);saveLocal();render();if(supabaseClient)await supabaseClient.from("shopping_items").delete().in("id",ids);toast("Comprados borrados ♡")}
+function finish(){const b=items.filter(x=>x.done);if(!b.length){toast("Aún no hay productos comprados");return}const total=b.reduce((s,x)=>s+(Number(x.actual_price)||0)*(Number(x.quantity)||1),0);const h=hist();h.unshift({date:new Intl.DateTimeFormat("es-ES",{dateStyle:"medium"}).format(new Date()),count:b.reduce((s,x)=>s+(Number(x.quantity)||1),0),total,items:b.map(x=>({...x}))});localStorage.setItem("our-home-history",JSON.stringify(h.slice(0,20)));currentTab="history";render();toast("Compra guardada en el historial ♡")}
+function repeat(i){const h=hist()[i];if(!h)return;const now=new Date().toISOString();const c=h.items.map(x=>({...x,id:uid(),done:false,actual_price:null,created_at:now}));items=[...c,...items];saveLocal();render();c.forEach(syncInsert);toast("Productos añadidos ♡")}
+function loadSupabase(){const s=document.createElement("script");s.src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2";s.async=true;s.onload=connect;s.onerror=()=>status(false,"Lista local · sincronización no disponible");document.head.appendChild(s)}
+async function connect(){try{if(!window.supabase){status(false,"Lista local · sincronización no disponible");return}supabaseClient=window.supabase.createClient(SUPABASE_URL,SUPABASE_KEY);const r=await supabaseClient.from("shopping_items").select("*").order("created_at",{ascending:false});if(r.error){console.error(r.error);status(false,"Lista local · revisa la sincronización");return}const remote=r.data||[];const ids=new Set(remote.map(x=>x.id));const localOnly=items.filter(x=>!ids.has(x.id));if(localOnly.length){const clean=localOnly.map(x=>({id:x.id,name:x.name,category:x.category||"🛒 General",planned_price:x.planned_price,actual_price:x.actual_price,done:!!x.done,created_at:x.created_at||new Date().toISOString(),quantity:Number(x.quantity)||1,person:x.person||"Alyssa"}));await supabaseClient.from("shopping_items").insert(clean)}items=[...remote,...localOnly];saveLocal();render();supabaseClient.channel("shopping-live").on("postgres_changes",{event:"*",schema:"public",table:"shopping_items"},p=>{const r=p.new||p.old;if(!r||!r.id)return;if(p.eventType==="INSERT"&&!items.some(x=>x.id===r.id))items.unshift(r);if(p.eventType==="UPDATE"){const i=items.findIndex(x=>x.id===r.id);if(i>=0)items[i]=r;else items.unshift(r)}if(p.eventType==="DELETE")items=items.filter(x=>x.id!==r.id);saveLocal();render()}).subscribe(st=>{if(st==="SUBSCRIBED")status(true,"Sincronizado · compartido")})}catch(e){console.error(e);status(false,"Lista local · sincronización no disponible")}}
+document.addEventListener("click",e=>{const t=e.target.closest(".tab");if(t){currentTab=t.dataset.tab;render();return}const f=e.target.closest(".filter");if(f){currentFilter=f.dataset.filter;document.querySelectorAll(".filter").forEach(x=>x.classList.remove("active"));f.classList.add("active");renderList();return}const a=e.target.closest("[data-action]");if(!a)return;const id=a.dataset.id;if(a.dataset.action==="toggle")toggle(id);else if(a.dataset.action==="buy")buy(id);else if(a.dataset.action==="delete")del(id);else if(a.dataset.action==="repeat")repeat(Number(a.dataset.index))});
+$("addBtn").addEventListener("click",addItem);$("productInput").addEventListener("keydown",e=>{if(e.key==="Enter")addItem()});$("plannedPriceInput").addEventListener("keydown",e=>{if(e.key==="Enter")addItem()});$("clearDone").addEventListener("click",clearDone);$("backToList").addEventListener("click",()=>{currentTab="list";render()});$("finishShopping").addEventListener("click",finish);$("budgetInput").addEventListener("change",()=>{localStorage.setItem("our-home-budget",String(Number($("budgetInput").value||0)));renderBudget()});
+render();status(false,"Preparando sincronización…");loadSupabase();
+})();
 </script>
 </body>
 </html>
